@@ -66,6 +66,7 @@
   --r-lg: 26px;
   --r-xl: 34px;
 
+  --grad-brand: linear-gradient(120deg, #7C3AED 0%, #A21CAF 50%, #DB2777 100%);
   --grad-roxo: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
   --grad-verde: linear-gradient(135deg, #4ADE80 0%, #16A34A 100%);
   --grad-streak: linear-gradient(135deg, #FDBA74 0%, #F97316 100%);
@@ -238,18 +239,24 @@ img { max-width:100%; display:block; }
 .tab.active .ic{ transform:translateY(-1px) scale(1.12); }
 
 /* =========================================================================
-   Logo mark
+   Logo — wordmark "flipei" minúsculo com gradiente roxo→magenta
    ========================================================================= */
-.logo{ display:inline-flex; align-items:center; gap:10px; }
-.logo .mark{
-  width:44px; height:44px; border-radius:13px; background:var(--grad-roxo);
-  display:grid; place-items:center; color:#fff; font-family:'Baloo 2'; font-weight:800; font-size:24px;
-  box-shadow:0 6px 14px rgba(124,58,237,.4); transform:rotate(-6deg);
-  position:relative;
+.logo-word{
+  font-family:'Baloo 2','Nunito',sans-serif; font-weight:800; letter-spacing:-1px; line-height:1;
+  background:var(--grad-brand); -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent; display:inline-block;
 }
-.logo .mark::after{ content:""; position:absolute; right:-3px; bottom:-3px; width:14px; height:14px; border-radius:5px; background:var(--verde-500); border:2px solid #fff; }
-.logo .word{ font-family:'Baloo 2'; font-weight:800; font-size:27px; color:var(--ink); letter-spacing:-.3px; }
-.logo .word b{ color:var(--roxo-600); }
+.logo-word.light{ background:linear-gradient(120deg,#C4B5FD,#F0ABFC,#F9A8D4); -webkit-background-clip:text; background-clip:text; }
+.logo-hero{ display:flex; align-items:center; justify-content:center; }
+.logo-hero .logo-word{ filter:drop-shadow(0 8px 16px rgba(168,28,175,.25)); }
+
+/* splash flip illustration (CSS puro) */
+.flip-illo{ position:relative; width:120px; height:130px; margin-bottom:4px; }
+.flip-illo .fi-card{ position:absolute; width:92px; height:120px; border-radius:18px; box-shadow:var(--sh-lg); }
+.flip-illo .fi-back{ left:8px; top:6px; background:linear-gradient(160deg,#EDE9FE,#FBCFE8); transform:rotate(-12deg); }
+.flip-illo .fi-front{ right:0; top:0; background:var(--grad-brand); transform:rotate(8deg); display:grid; place-items:center; animation:bob 2.4s ease-in-out infinite; }
+.flip-illo .fi-front span{ font-family:'Baloo 2'; font-weight:800; font-size:46px; color:#fff; }
+.splash-hero{ gap:14px; }
 
 /* =========================================================================
    Onboarding / Role select
@@ -432,11 +439,49 @@ table.tbl tr:hover td{ background:#FAFBFE; cursor:pointer; }
 /* Insight / suggestion box */
 .insight{ border-left:4px solid var(--roxo-500); background:var(--roxo-50); border-radius:0 14px 14px 0; padding:14px 16px; }
 
-/* role-switch floating */
-.role-switch{ position:fixed; right:14px; bottom:14px; z-index:8000; display:flex; gap:8px; background:#fff; padding:7px; border-radius:16px; box-shadow:var(--sh-lg); border:1px solid var(--line); }
-.role-switch button{ padding:8px 12px; border-radius:11px; font-weight:900; font-size:12px; color:var(--ink-soft); }
-.role-switch button.on{ background:var(--roxo-600); color:#fff; }
-@media (max-width:520px){ .role-switch{ bottom:auto; top:8px; right:8px; transform:scale(.9); } }
+/* floating view controls (demo): modo Aluno/Escola + Celular/Computador */
+.view-controls{ position:fixed; right:14px; bottom:14px; z-index:8000; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+.vc-group{ display:flex; align-items:center; gap:6px; background:#fff; padding:6px; border-radius:14px; box-shadow:var(--sh-lg); border:1px solid var(--line); }
+.vc-group .vc-lbl{ font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-faint); padding-left:6px; }
+.vc-group button{ padding:7px 11px; border-radius:10px; font-weight:900; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+.vc-group button.on{ background:var(--roxo-600); color:#fff; }
+@media (max-width:560px){ .view-controls{ bottom:auto; top:8px; right:8px; transform:scale(.88); transform-origin:top right; } }
+
+/* text inputs (onboarding / forms) */
+.onb-input{ width:100%; border:2px solid var(--line-strong); border-radius:14px; padding:13px 15px; font-family:inherit; font-weight:700; font-size:15px; color:var(--ink); margin-top:4px; background:#fff; transition:border-color .15s; }
+.onb-input:focus{ outline:none; border-color:var(--roxo-500); }
+.onb-input::placeholder{ color:var(--ink-faint); font-weight:600; }
+select.onb-input{ appearance:none; cursor:pointer; }
+.onb-input-wrap{ margin-top:14px; }
+
+/* =========================================================================
+   DESKTOP web shell (app do aluno em "Computador")
+   ========================================================================= */
+.webcard{ width:min(460px,94vw); max-height:94vh; background:var(--surface); border-radius:28px; box-shadow:var(--sh-lg); overflow:hidden; display:flex; flex-direction:column; border:1px solid var(--line); }
+.webcard .onb{ height:auto; }
+
+.webwrap{ display:flex; height:100%; width:100%; background:var(--bg); }
+.webside{
+  width:248px; flex:none; background:#fff; border-right:1px solid var(--line);
+  display:flex; flex-direction:column; padding:18px 12px; gap:4px;
+}
+.webnavlist{ display:flex; flex-direction:column; gap:4px; margin-top:6px; padding:0 4px; }
+.webnav{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; font-weight:800; font-size:15px; color:var(--ink-soft); }
+.webnav .ic{ font-size:20px; }
+.webnav:hover{ background:var(--roxo-50); color:var(--roxo-700); }
+.webnav.on{ background:var(--roxo-50); color:var(--roxo-700); box-shadow:inset 0 0 0 2px var(--roxo-300); }
+.webuser{ margin-top:auto; display:flex; gap:10px; align-items:center; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--line); }
+.webmain{ flex:1; min-width:0; display:flex; justify-content:center; }
+.webcol{ width:100%; max-width:560px; padding:18px 0 60px; }
+.webcol .topbar{ padding-top:8px; }
+
+@media (max-width:900px){
+  .webside{ width:72px; padding:14px 8px; }
+  .webside .logo-word, .webnav span:not(.ic), .webuser .col, .webside .btn span, .webside .btn{ }
+  .webside > div:first-child{ display:flex; justify-content:center; }
+  .webnav{ justify-content:center; } .webnav span:not(.ic){ display:none; }
+  .webuser .col{ display:none; }
+}
 
 /* school responsive: collapse sidebar */
 @media (max-width:860px){
@@ -652,7 +697,7 @@ const SCHOOL = {
 };
 
 /* =========================================================================
-   FLIPEI — UI helpers: render engine, toasts, FX, charts
+   FLIPEI — UI engine: router, event delegation, toasts, FX, charts
    ========================================================================= */
 
 const App = {
@@ -660,48 +705,55 @@ const App = {
   route: 'splash',
   params: {},
   role: 'aluno',          // 'aluno' | 'escola'
-  // mutable session state
+  device: 'mobile',       // 'mobile' | 'desktop'  (apenas aluno)
+  _wired: false,
   s: {
     streak: STUDENT.streak,
     xp: STUDENT.xp,
     xpToday: 0,
     gems: STUDENT.gems,
-    lives: STUDENT.lives,
     goal: STUDENT.goal,
     exam: 'enem',
     selectedSubjects: ['bio','mat','qui'],
+    linkedSchool: null,          // escola vinculada pelo aluno
     // game
     deck: [],
     deckIndex: 0,
+    revealed: false,
     combo: 0,
     sessionCorrect: 0,
     sessionTotal: 0,
     sessionXp: 0,
+    // onboarding
     onboardStep: 0,
-    onboardGoal: null,
+    onb_goalKind: null,          // 'enem' | 'uni' | 'curso' | 'explorar'
+    onb_goalText: '',
+    onb_level: null,
+    onb_time: null,
+    // ui
     rankTab: 'geral',
     schoolPage: 'dashboard',
     detailStudent: null,
+    // school deck builder
+    deckDraft: { title:'', subj:'bio', cards:[] },
   },
 };
 
-// ---- tiny DOM helper ----
+// ---- tiny DOM helpers ----
 function el(html){ const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
 function $(sel, ctx){ return (ctx||document).querySelector(sel); }
 function $(sel, ctx){ return Array.from((ctx||document).querySelectorAll(sel)); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 // ---- navigation ----
-function go(route, params){
-  App.route = route;
-  App.params = params || {};
-  render();
-}
+function go(route, params){ App.route = route; App.params = params || {}; render(); }
 function setRole(role){
   App.role = role;
-  if(role === 'escola'){ App.route = 'school'; App.s.schoolPage = 'dashboard'; }
-  else { App.route = (App.route && App.route.indexOf('school')===0) ? 'home' : App.route; if(App.route==='school') App.route='home'; }
+  if(role === 'escola'){ App.s.schoolPage = 'dashboard'; App.s.detailStudent = null; }
+  else if(App.route && App.route.indexOf('school')===0){ App.route = 'home'; }
   render();
 }
+function setDevice(d){ App.device = d; render(); }
 
 // ---- master render ----
 function render(){
@@ -709,68 +761,64 @@ function render(){
   let view = '';
   if(App.role === 'escola'){
     view = SchoolPortal();
+  } else if(App.route === 'splash'){
+    view = DeviceWrap(Splash(), { bare:true });
+  } else if(App.route === 'onboarding'){
+    view = DeviceWrap(Onboarding(), { bare:true });
   } else {
-    switch(App.route){
-      case 'splash':       view = Splash(); break;
-      case 'onboarding':   view = Onboarding(); break;
-      case 'home':         view = PhoneShell(Home(), 'home'); break;
-      case 'game':         view = PhoneShell(Game(), null); break;
-      case 'complete':     view = PhoneShell(Complete(), null); break;
-      case 'ranking':      view = PhoneShell(Ranking(), 'ranking'); break;
-      case 'personalize':  view = PhoneShell(Personalize(), 'personalize'); break;
-      case 'profile':      view = PhoneShell(Profile(), 'profile'); break;
-      default:             view = Splash();
-    }
+    const tab = ['home','ranking','personalize','profile'].includes(App.route) ? App.route : null;
+    const inner = ScreenFor(App.route);
+    view = DeviceWrap(inner, { tab });
   }
   App.root.innerHTML = view;
-  bindAfterRender();
-  renderRoleSwitch();
+  renderControls();
+  wireOnce();
+  runPostRender();
 }
 
-function renderRoleSwitch(){
-  let rs = document.getElementById('role-switch');
-  if(!rs){
-    rs = el(`<div class="role-switch" id="role-switch">
-      <button data-role="aluno">👤 Aluno</button>
-      <button data-role="escola">🏫 Escola</button>
-    </div>`);
-    document.body.appendChild(rs);
-    rs.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) setRole(b.dataset.role); });
+function ScreenFor(route){
+  switch(route){
+    case 'home':         return Home();
+    case 'game':         return Game();
+    case 'complete':     return Complete();
+    case 'ranking':      return Ranking();
+    case 'personalize':  return Personalize();
+    case 'profile':      return Profile();
+    case 'linkSchool':   return LinkSchool();
+    default:             return Home();
   }
-  $('#role-switch button').forEach(b=> b.classList.toggle('on', b.dataset.role===App.role));
-  // hide switch on the very first splash to keep it clean? keep visible for demo.
 }
 
-// Hook up generic [data-go] navigation + screen-specific binds
-function bindAfterRender(){
-  $('[data-go]').forEach(node=>{
-    node.addEventListener('click', ()=> go(node.dataset.go, node.dataset.param ? JSON.parse(node.dataset.param) : {}));
-  });
-  if(typeof bindHome==='function' && App.route==='home') bindHome();
-  if(typeof bindGame==='function' && App.route==='game') bindGame();
-  if(typeof bindOnboarding==='function' && App.route==='onboarding') bindOnboarding();
-  if(typeof bindRanking==='function' && App.route==='ranking') bindRanking();
-  if(typeof bindPersonalize==='function' && App.route==='personalize') bindPersonalize();
-  if(typeof bindComplete==='function' && App.route==='complete') bindComplete();
-  if(App.role==='escola' && typeof bindSchool==='function') bindSchool();
+// post-render side effects (charts already animate via SVG; confetti etc.)
+function runPostRender(){
+  if(App.role==='aluno' && App.route==='complete'){
+    confetti({count:160, y: innerHeight*0.30});
+    const xpNode = $('#c-xp'); if(xpNode) countUp(xpNode, App.s.sessionXp, 1000);
+    App.s.deck = [];
+  }
 }
 
 // =========================================================================
-// Phone shell with tab bar
+// Device wrappers — celular (moldura) ou computador (layout web)
 // =========================================================================
-function PhoneShell(inner, activeTab){
-  const tabs = [
-    { id:'home', route:'home', ic:'🏠', label:'Início' },
-    { id:'ranking', route:'ranking', ic:'🏆', label:'Ranking' },
-    { id:'personalize', route:'personalize', ic:'🎯', label:'Personalizar' },
-    { id:'profile', route:'profile', ic:'📊', label:'Perfil' },
-  ];
-  const tabbar = activeTab ? `
+function DeviceWrap(inner, opts){
+  opts = opts || {};
+  if(App.device === 'desktop') return DesktopShell(inner, opts);
+  return PhoneShell(inner, opts);
+}
+
+const NAV = [
+  { id:'home', ic:'🏠', label:'Início' },
+  { id:'ranking', ic:'🏆', label:'Ranking' },
+  { id:'personalize', ic:'🎯', label:'Personalizar' },
+  { id:'profile', ic:'📊', label:'Perfil' },
+];
+
+function PhoneShell(inner, opts){
+  const tabbar = opts.tab ? `
     <div class="tabbar">
-      ${tabs.map(t=>`
-        <div class="tab ${t.id===activeTab?'active':''}" data-go="${t.route}">
-          <div class="ic">${t.ic}</div><div>${t.label}</div>
-        </div>`).join('')}
+      ${NAV.map(t=>`<button class="tab ${t.id===opts.tab?'active':''}" data-act="go" data-route="${t.id}">
+        <span class="ic">${t.ic}</span><span>${t.label}</span></button>`).join('')}
     </div>` : '';
   return `
   <div class="stage">
@@ -784,6 +832,125 @@ function PhoneShell(inner, activeTab){
   </div>`;
 }
 
+function DesktopShell(inner, opts){
+  // splash/onboarding: centralizado sem sidebar
+  if(opts.bare){
+    return `<div class="stage"><div class="webcard fade-in">${inner}</div></div>`;
+  }
+  const nav = `${NAV.map(t=>`<button class="webnav ${t.id===opts.tab?'on':''}" data-act="go" data-route="${t.id}">
+      <span class="ic">${t.ic}</span><span>${t.label}</span></button>`).join('')}`;
+  return `
+  <div class="webwrap">
+    <aside class="webside">
+      <div style="padding:6px 10px 14px">${Logo(26)}</div>
+      <nav class="webnavlist">${nav}</nav>
+      <button class="btn btn-roxo btn-block mt12" data-act="go" data-route="game" style="margin:0 8px">▶ Estudar</button>
+      <div class="webuser">
+        <div class="avatar" style="width:38px;height:38px;font-size:15px;background:var(--roxo-600)">${STUDENT.name[0]}</div>
+        <div class="col"><span class="b9 small">${esc(STUDENT.name)}</span><span class="tiny faint">🔥 ${App.s.streak} · ${App.s.xp.toLocaleString('pt-BR')} XP</span></div>
+      </div>
+    </aside>
+    <main class="webmain scroll">
+      <div class="webcol fade-in">${inner}</div>
+    </main>
+  </div>`;
+}
+
+// =========================================================================
+// Floating controls: alternar Aluno/Escola e Celular/Computador
+// =========================================================================
+function renderControls(){
+  let rs = document.getElementById('view-controls');
+  if(!rs){ rs = el(`<div class="view-controls" id="view-controls"></div>`); document.body.appendChild(rs); }
+  const deviceCtrl = App.role==='aluno' ? `
+    <div class="vc-group">
+      <span class="vc-lbl">Ver em</span>
+      <button class="${App.device==='mobile'?'on':''}" data-act="device" data-d="mobile">📱 Celular</button>
+      <button class="${App.device==='desktop'?'on':''}" data-act="device" data-d="desktop">🖥️ Computador</button>
+    </div>` : '';
+  rs.innerHTML = `
+    <div class="vc-group">
+      <span class="vc-lbl">Modo</span>
+      <button class="${App.role==='aluno'?'on':''}" data-act="role" data-r="aluno">👤 Aluno</button>
+      <button class="${App.role==='escola'?'on':''}" data-act="role" data-r="escola">🏫 Escola</button>
+    </div>
+    ${deviceCtrl}`;
+}
+
+// =========================================================================
+// EVENT DELEGATION — uma única escuta global (robusto, sem rebind)
+// =========================================================================
+function wireOnce(){
+  if(App._wired) return;
+  App._wired = true;
+
+  document.addEventListener('click', (e)=>{
+    const t = e.target.closest('[data-act]');
+    if(!t) return;
+    handleAct(t.dataset.act, t, e);
+  });
+  // live model binding p/ inputs de texto (sem re-render, preserva foco)
+  document.addEventListener('input', (e)=>{
+    const t = e.target.closest('[data-model]');
+    if(t){ App.s[t.dataset.model] = t.value; refreshOnbButton(); }
+  });
+  window.addEventListener('resize', ()=>{ const c=document.getElementById('fx-canvas'); if(c){c.width=innerWidth;c.height=innerHeight;} });
+}
+
+function refreshOnbButton(){
+  if(App.route!=='onboarding') return;
+  const btn = $('#onb-next'); if(!btn) return;
+  btn.disabled = !onbCanContinue();
+}
+
+function handleAct(act, t, e){
+  const d = t.dataset;
+  switch(act){
+    // global
+    case 'go':        go(d.route); break;
+    case 'role':      setRole(d.r); break;
+    case 'device':    setDevice(d.d); break;
+
+    // onboarding
+    case 'onb-pick':  App.s.onb_goalKind = d.val; render(); break;
+    case 'onb-suggest': App.s.onb_goalText = d.val; render(); break;
+    case 'onb-level': App.s.onb_level = d.val; render(); break;
+    case 'onb-time':  App.s.onb_time = d.val; render(); break;
+    case 'onb-back':  if(App.s.onboardStep===0){ go('splash'); } else { App.s.onboardStep--; render(); } break;
+    case 'onb-next':  onbNext(); break;
+
+    // game
+    case 'reveal':    App.s.revealed = true; render(); break;
+    case 'rate':      gameAnswer(parseInt(d.rate,10), t); break;
+    case 'quit':      if(confirm('Sair da sessão? O progresso desta sessão será perdido.')){ App.s.deck=[]; App.s.revealed=false; go('home'); } break;
+
+    // ranking
+    case 'rank-tab':  App.s.rankTab = d.tab; render(); break;
+
+    // personalize
+    case 'set-exam':  { App.s.exam=d.exam; const ex=EXAMS.find(x=>x.id===d.exam); App.s.goal=ex?ex.name:App.s.goal; toast('Foco atualizado: '+(ex?ex.name:''),'success','🎯'); render(); } break;
+    case 'toggle-subj': {
+      const id=d.subj, arr=App.s.selectedSubjects;
+      if(arr.includes(id)){ if(arr.length>1) App.s.selectedSubjects=arr.filter(x=>x!==id); else toast('Escolha ao menos 1 matéria','warn','⚠️'); }
+      else App.s.selectedSubjects=[...arr,id];
+      render(); break;
+    }
+
+    // vincular escola
+    case 'link-open':  go('linkSchool'); break;
+    case 'link-submit': submitLink(); break;
+    case 'link-cancel': go('profile'); break;
+    case 'unlink':     if(confirm('Desvincular da escola? Ela deixará de ver seu progresso.')){ App.s.linkedSchool=null; toast('Escola desvinculada','brand','🔌'); go('profile'); } break;
+
+    // school portal
+    case 'school-page': App.s.schoolPage=d.page; App.s.detailStudent=null; render(); break;
+    case 'open-student': App.s.detailStudent=d.student; App.s.schoolPage='alunos'; render(); break;
+    case 'back-students': App.s.detailStudent=null; render(); break;
+    case 'deck-add-card': schoolAddCard(); break;
+    case 'deck-publish': schoolPublishDeck(); break;
+  }
+}
+
 // =========================================================================
 // Toasts + FX
 // =========================================================================
@@ -794,290 +961,247 @@ function toast(msg, type, icon){
   setTimeout(()=>{ t.style.transition='.3s'; t.style.opacity='0'; t.style.transform='translateY(-10px)'; setTimeout(()=>t.remove(),300); }, 1900);
 }
 
-// Confetti burst
 function confetti(opts){
-  const c = document.getElementById('fx-canvas');
-  const ctx = c.getContext('2d');
-  c.width = innerWidth; c.height = innerHeight;
-  const colors = ['#7C3AED','#22C55E','#FB923C','#FACC15','#EC4899','#3B82F6'];
-  const N = (opts&&opts.count)||140;
-  const parts = [];
-  const cx = (opts&&opts.x) || innerWidth/2;
-  const cy = (opts&&opts.y) || innerHeight/2;
-  for(let i=0;i<N;i++){
-    parts.push({
-      x:cx, y:cy,
-      vx:(Math.random()-.5)*14, vy:(Math.random()*-15)-4,
-      g:0.4+Math.random()*0.3, r:5+Math.random()*7,
-      rot:Math.random()*6, vr:(Math.random()-.5)*.4,
-      c:colors[(Math.random()*colors.length)|0], life:0, max:80+Math.random()*40,
-      shape: Math.random()>.5?'rect':'circ',
-    });
-  }
+  const c = document.getElementById('fx-canvas'); if(!c) return;
+  const ctx = c.getContext('2d'); c.width = innerWidth; c.height = innerHeight;
+  const colors = ['#7C3AED','#DB2777','#22C55E','#FB923C','#FACC15','#3B82F6'];
+  const N = (opts&&opts.count)||140, parts=[];
+  const cx=(opts&&opts.x)||innerWidth/2, cy=(opts&&opts.y)||innerHeight/2;
+  for(let i=0;i<N;i++) parts.push({ x:cx,y:cy, vx:(Math.random()-.5)*14, vy:(Math.random()*-15)-4, g:.4+Math.random()*.3, r:5+Math.random()*7, rot:Math.random()*6, vr:(Math.random()-.5)*.4, c:colors[(Math.random()*colors.length)|0], life:0, max:80+Math.random()*40, shape:Math.random()>.5?'rect':'circ' });
   let frame=0;
-  function step(){
-    ctx.clearRect(0,0,c.width,c.height);
-    let alive=false;
-    parts.forEach(p=>{
-      if(p.life>p.max) return;
-      alive=true; p.life++;
-      p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
-      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
-      ctx.globalAlpha = Math.max(0, 1-(p.life/p.max));
-      ctx.fillStyle=p.c;
-      if(p.shape==='rect') ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.4);
-      else { ctx.beginPath(); ctx.arc(0,0,p.r/1.6,0,7); ctx.fill(); }
-      ctx.restore();
-    });
-    frame++;
-    if(alive && frame<160) requestAnimationFrame(step);
-    else ctx.clearRect(0,0,c.width,c.height);
-  }
-  step();
+  (function step(){
+    ctx.clearRect(0,0,c.width,c.height); let alive=false;
+    parts.forEach(p=>{ if(p.life>p.max) return; alive=true; p.life++; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.globalAlpha=Math.max(0,1-p.life/p.max); ctx.fillStyle=p.c;
+      if(p.shape==='rect') ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.4); else { ctx.beginPath(); ctx.arc(0,0,p.r/1.6,0,7); ctx.fill(); }
+      ctx.restore(); });
+    frame++; if(alive&&frame<160) requestAnimationFrame(step); else ctx.clearRect(0,0,c.width,c.height);
+  })();
 }
 
-// floating +XP near an element
 function floatXp(amount, target){
+  if(!target||!target.getBoundingClientRect) return;
   const r = target.getBoundingClientRect();
   const f = el(`<div class="xp-float">+${amount} XP</div>`);
-  f.style.left = (r.left + r.width/2 - 20)+'px';
-  f.style.top = (r.top + 20)+'px';
-  f.style.position='fixed'; f.style.zIndex=9200;
-  document.body.appendChild(f);
-  setTimeout(()=>f.remove(), 1000);
+  f.style.cssText = `left:${r.left+r.width/2-20}px;top:${r.top+10}px;position:fixed;z-index:9200;`;
+  document.body.appendChild(f); setTimeout(()=>f.remove(),1000);
 }
 
 // =========================================================================
-// SVG chart helpers
+// SVG charts
 // =========================================================================
-
-// Animated bar chart (vertical)
 function barChart(data, opts){
-  opts = opts || {};
-  const W = opts.w||520, H = opts.h||180, pad=24;
-  const max = Math.max.apply(null, data.map(d=>d.v)) * 1.15 || 1;
-  const bw = (W - pad*2) / data.length;
-  const bars = data.map((d,i)=>{
-    const h = (d.v/max)*(H-pad-24);
-    const x = pad + i*bw + bw*0.18;
-    const w = bw*0.64;
-    const y = H-24-h;
-    const color = d.color || '#7C3AED';
-    return `
-      <rect x="${x}" y="${H-24}" width="${w}" height="0" rx="6" fill="${color}">
-        <animate attributeName="height" from="0" to="${h}" dur="0.7s" fill="freeze" begin="${i*0.05}s" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/>
-        <animate attributeName="y" from="${H-24}" to="${y}" dur="0.7s" fill="freeze" begin="${i*0.05}s" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/>
-      </rect>
+  opts=opts||{}; const W=opts.w||520,H=opts.h||180,pad=24;
+  const max=Math.max.apply(null,data.map(d=>d.v))*1.15||1, bw=(W-pad*2)/data.length;
+  const bars=data.map((d,i)=>{ const h=(d.v/max)*(H-pad-24), x=pad+i*bw+bw*0.18, w=bw*0.64, y=H-24-h, color=d.color||'#7C3AED';
+    return `<rect x="${x}" y="${H-24}" width="${w}" height="0" rx="6" fill="${color}">
+      <animate attributeName="height" from="0" to="${h}" dur="0.7s" fill="freeze" begin="${i*0.05}s" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/>
+      <animate attributeName="y" from="${H-24}" to="${y}" dur="0.7s" fill="freeze" begin="${i*0.05}s" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/></rect>
       ${opts.values?`<text x="${x+w/2}" y="${y-6}" text-anchor="middle" font-size="11" font-weight="800" fill="#5B5470">${d.v}</text>`:''}
-      <text x="${x+w/2}" y="${H-8}" text-anchor="middle" font-size="11" font-weight="700" fill="#9690A8">${d.l}</text>`;
-  }).join('');
+      <text x="${x+w/2}" y="${H-8}" text-anchor="middle" font-size="11" font-weight="700" fill="#9690A8">${d.l}</text>`; }).join('');
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${bars}</svg>`;
 }
-
-// Horizontal bars (for accuracy by subject)
 function hBars(data, opts){
-  opts = opts || {};
-  const W = opts.w||520, rowH=34, pad=8;
-  const H = data.length*rowH + pad*2;
-  const labelW = opts.labelW||96;
-  const max = 100;
-  const rows = data.map((d,i)=>{
-    const y = pad + i*rowH;
-    const full = W - labelW - 50;
-    const w = (d.v/max)*full;
-    const color = d.color||'#7C3AED';
-    return `
-      <text x="0" y="${y+rowH/2+4}" font-size="12.5" font-weight="800" fill="#1F1235">${d.l}</text>
+  opts=opts||{}; const W=opts.w||520,rowH=34,pad=8,H=data.length*rowH+pad*2,labelW=opts.labelW||96,max=100;
+  const rows=data.map((d,i)=>{ const y=pad+i*rowH,full=W-labelW-50,w=(d.v/max)*full,color=d.color||'#7C3AED';
+    return `<text x="0" y="${y+rowH/2+4}" font-size="12.5" font-weight="800" fill="#1F1235">${d.l}</text>
       <rect x="${labelW}" y="${y+8}" width="${full}" height="${rowH-16}" rx="9" fill="#EEEBF5"/>
       <rect x="${labelW}" y="${y+8}" width="0" height="${rowH-16}" rx="9" fill="${color}">
-        <animate attributeName="width" from="0" to="${w}" dur="0.8s" fill="freeze" begin="${i*0.06}s" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/>
-      </rect>
-      <text x="${W-2}" y="${y+rowH/2+4}" text-anchor="end" font-size="12.5" font-weight="900" fill="${color}">${d.v}%</text>`;
-  }).join('');
+        <animate attributeName="width" from="0" to="${w}" dur="0.8s" fill="freeze" begin="${i*0.06}s" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/></rect>
+      <text x="${W-2}" y="${y+rowH/2+4}" text-anchor="end" font-size="12.5" font-weight="900" fill="${color}">${d.v}%</text>`; }).join('');
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${rows}</svg>`;
 }
-
-// Line/area chart
 function lineChart(values, opts){
-  opts = opts || {};
-  const W = opts.w||520, H = opts.h||180, pad=18, padB=22;
-  const max = Math.max.apply(null, values)*1.2 || 1;
-  const stepX = (W-pad*2)/(values.length-1);
-  const pts = values.map((v,i)=>[pad+i*stepX, H-padB-(v/max)*(H-pad-padB)]);
-  const line = pts.map((p,i)=> (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
-  const area = line + ` L ${pts[pts.length-1][0]} ${H-padB} L ${pts[0][0]} ${H-padB} Z`;
-  const dots = pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#7C3AED" stroke="#fff" stroke-width="2"/>`).join('');
-  const color = opts.color||'#7C3AED';
+  opts=opts||{}; const W=opts.w||520,H=opts.h||180,pad=18,padB=22;
+  const max=Math.max.apply(null,values)*1.2||1, stepX=(W-pad*2)/(values.length-1);
+  const pts=values.map((v,i)=>[pad+i*stepX, H-padB-(v/max)*(H-pad-padB)]);
+  const line=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=line+` L ${pts[pts.length-1][0]} ${H-padB} L ${pts[0][0]} ${H-padB} Z`;
+  const dots=pts.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#7C3AED" stroke="#fff" stroke-width="2"/>`).join('');
+  const color=opts.color||'#7C3AED';
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${opts.cssH||180}px">
-    <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${color}" stop-opacity="0.28"/><stop offset="1" stop-color="${color}" stop-opacity="0"/>
-    </linearGradient></defs>
+    <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity="0.28"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
     <path d="${area}" fill="url(#lg)"/>
-    <path d="${line}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
-      stroke-dasharray="1400" stroke-dashoffset="1400"><animate attributeName="stroke-dashoffset" to="0" dur="1s" fill="freeze"/></path>
-    ${dots}
-  </svg>`;
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1400" stroke-dashoffset="1400"><animate attributeName="stroke-dashoffset" to="0" dur="1s" fill="freeze"/></path>
+    ${dots}</svg>`;
 }
-
-// Donut / progress ring
 function ring(pct, opts){
-  opts = opts || {};
-  const size = opts.size||120, sw=opts.stroke||14, r=(size-sw)/2, c=2*Math.PI*r;
-  const color = opts.color||'#7C3AED';
+  opts=opts||{}; const size=opts.size||120,sw=opts.stroke||14,r=(size-sw)/2,c=2*Math.PI*r,color=opts.color||'#7C3AED';
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#EEEBF5" stroke-width="${sw}"/>
-    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"
-      stroke-dasharray="${c}" stroke-dashoffset="${c}" transform="rotate(-90 ${size/2} ${size/2})">
-      <animate attributeName="stroke-dashoffset" from="${c}" to="${c*(1-pct/100)}" dur="1s" fill="freeze" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/>
-    </circle>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}" transform="rotate(-90 ${size/2} ${size/2})">
+      <animate attributeName="stroke-dashoffset" from="${c}" to="${c*(1-pct/100)}" dur="1s" fill="freeze" calcMode="spline" keySplines="0.2 0.8 0.2 1" keyTimes="0;1"/></circle>
     <text x="50%" y="50%" text-anchor="middle" dy="0.1em" font-family="'Baloo 2'" font-weight="800" font-size="${size*0.26}" fill="${color}">${opts.label!==undefined?opts.label:pct+'%'}</text>
-    ${opts.sub?`<text x="50%" y="50%" dy="${size*0.22}" text-anchor="middle" font-size="11" font-weight="800" fill="#9690A8">${opts.sub}</text>`:''}
-  </svg>`;
+    ${opts.sub?`<text x="50%" y="50%" dy="${size*0.22}" text-anchor="middle" font-size="11" font-weight="800" fill="#9690A8">${opts.sub}</text>`:''}</svg>`;
 }
-
-// Count-up animation on a number element
 function countUp(node, to, dur){
-  dur = dur||900; const start=performance.now(); const from=0;
-  function tick(now){
-    const t = Math.min(1,(now-start)/dur);
-    const e = 1-Math.pow(1-t,3);
-    node.textContent = Math.round(from+(to-from)*e).toLocaleString('pt-BR');
-    if(t<1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
+  dur=dur||900; const start=performance.now();
+  (function tick(now){ const t=Math.min(1,(now-start)/dur), e=1-Math.pow(1-t,3); node.textContent=Math.round(to*e).toLocaleString('pt-BR'); if(t<1) requestAnimationFrame(tick); })(performance.now());
 }
 
 /* =========================================================================
-   FLIPEI — Telas do ALUNO (experiência divertida / gamificada)
+   FLIPEI — Telas do ALUNO
    ========================================================================= */
 
-// ---------- Logo ----------
+// ---------- Logo (wordmark gradiente, minúsculo — vibe do Instagram) ----------
 function Logo(size){
-  return `<div class="logo">
-    <div class="mark">F</div>
-    <div class="word" ${size?`style="font-size:${size}px"`:''}>Flip<b>ei</b></div>
+  size = size || 28;
+  return `<span class="logo-word" style="font-size:${size}px">flipei</span>`;
+}
+function LogoBig(size){
+  size = size || 64;
+  return `<div class="logo-hero">
+    <span class="logo-word" style="font-size:${size}px">flipei</span>
   </div>`;
 }
 
 // =========================================================================
-// SPLASH / Boas-vindas
+// SPLASH
 // =========================================================================
 function Splash(){
   return `
-  <div class="stage">
-    <div class="phone">
-      <div class="phone-notch"></div>
-      <div class="onb fade-in" style="background:radial-gradient(120% 80% at 50% 0%, #F5F3FF, #fff);">
-        <div class="hero">
-          <div class="blob" style="width:160px;height:160px;background:var(--roxo-300);top:6%;left:-30px;"></div>
-          <div class="blob" style="width:120px;height:120px;background:var(--verde-300);bottom:18%;right:-20px;"></div>
-          <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;">
-            <div style="font-size:78px;transform:rotate(-8deg);filter:drop-shadow(0 14px 20px rgba(124,58,237,.35))">🃏</div>
-            ${Logo(40)}
-            <div class="h2" style="margin-top:18px;max-width:300px;">Estudar virou jogo.</div>
-            <p class="muted" style="max-width:280px;font-weight:700;">Flashcards + gamificação + IA para você passar no ENEM e no vestibular dos seus sonhos.</p>
-          </div>
-          <div style="display:flex;gap:18px;margin-top:10px;position:relative;z-index:2;">
-            <div class="tcenter"><div class="h2" style="color:var(--roxo-600)">🔥</div><div class="tiny b muted">Streaks</div></div>
-            <div class="tcenter"><div class="h2" style="color:var(--roxo-600)">🏆</div><div class="tiny b muted">Ligas</div></div>
-            <div class="tcenter"><div class="h2" style="color:var(--roxo-600)">🎯</div><div class="tiny b muted">No seu foco</div></div>
-          </div>
+  <div class="onb">
+    <div class="hero splash-hero">
+      <div class="blob" style="width:200px;height:200px;background:var(--roxo-300);top:2%;left:-40px;"></div>
+      <div class="blob" style="width:150px;height:150px;background:#F9A8D4;bottom:20%;right:-30px;"></div>
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;">
+        <div class="flip-illo">
+          <div class="fi-card fi-back"></div>
+          <div class="fi-card fi-front"><span>?</span></div>
         </div>
-        <div class="section">
-          <button class="btn btn-roxo btn-block btn-lg" data-go="onboarding">Começar agora</button>
-          <button class="btn btn-ghost btn-block mt8">Já tenho conta</button>
-          <p class="tiny faint tcenter mt12">Grátis para todo aluno • Disponível em breve na App Store, Google Play e Windows</p>
-        </div>
+        ${LogoBig(58)}
+        <div class="h2" style="margin-top:6px">Vira o card. Vira o jogo.</div>
+        <p class="muted" style="max-width:300px;font-weight:700;">O app de flashcards pra quem vai passar no ENEM e no vestibular. Estudar com gamificação, IA e foco no que importa.</p>
       </div>
+      <div style="display:flex;gap:22px;margin-top:8px;position:relative;z-index:2;">
+        <div class="tcenter"><div class="h2">🔥</div><div class="tiny b muted">Streaks</div></div>
+        <div class="tcenter"><div class="h2">🏆</div><div class="tiny b muted">Ligas</div></div>
+        <div class="tcenter"><div class="h2">🎯</div><div class="tiny b muted">No seu foco</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <button class="btn btn-roxo btn-block btn-lg" data-act="go" data-route="onboarding">Começar agora</button>
+      <button class="btn btn-ghost btn-block mt8">Já tenho conta</button>
+      <p class="tiny faint tcenter mt12">Grátis pra todo aluno • Em breve na App Store, Google Play e Windows</p>
     </div>
   </div>`;
 }
 
 // =========================================================================
-// ONBOARDING — escolha de objetivo (multi-step)
+// ONBOARDING — objetivo flexível (sem pressupor curso/universidade)
 // =========================================================================
-const ONB_GOALS = [
-  { id:'enem', emoji:'📝', t:'Passar no ENEM', d:'Foco no Exame Nacional' },
-  { id:'medicina', emoji:'🩺', t:'Cursar Medicina', d:'As provas mais concorridas' },
-  { id:'fuvest', emoji:'🎓', t:'USP / FUVEST', d:'Vestibular específico' },
-  { id:'explorar', emoji:'🧭', t:'Ainda estou decidindo', d:'Quero explorar' },
+const GOAL_KINDS = [
+  { id:'enem',     emoji:'📝', t:'Passar no ENEM', d:'Foco no Exame Nacional' },
+  { id:'uni',      emoji:'🏛️', t:'Uma universidade específica', d:'Ex.: USP, UFRGS, UERJ...' },
+  { id:'curso',    emoji:'🎓', t:'Entrar em um curso', d:'Ex.: Medicina, Direito, Engenharia...' },
+  { id:'explorar', emoji:'🧭', t:'Ainda estou decidindo', d:'Quero explorar e criar o hábito' },
 ];
-const ONB_LEVELS = [
+const UNI_SUGGEST = ['USP / FUVEST','UNICAMP','UFRGS','UERJ','UFMG','UFPR','UnB','Outra'];
+const CURSO_SUGGEST = ['Medicina','Direito','Engenharia','Psicologia','Administração','Enfermagem','Outro'];
+const LEVELS = [
   { id:'1', emoji:'🌱', t:'Começando do zero', d:'Quero criar o hábito' },
   { id:'2', emoji:'📚', t:'Já estudo às vezes', d:'Quero ser consistente' },
   { id:'3', emoji:'⚡', t:'Estudo sério', d:'Reta final, foco total' },
 ];
-const ONB_TIME = [
-  { id:'5', emoji:'☕', t:'5 min / dia', d:'Casual' },
+const TIMES = [
+  { id:'5',  emoji:'☕', t:'5 min / dia',  d:'Casual' },
   { id:'15', emoji:'🎯', t:'15 min / dia', d:'Regular (recomendado)' },
   { id:'30', emoji:'🔥', t:'30 min / dia', d:'Sério' },
   { id:'60', emoji:'🚀', t:'60 min / dia', d:'Intenso' },
 ];
 
+function onbCanContinue(){
+  const s = App.s;
+  if(s.onboardStep===0){
+    if(!s.onb_goalKind) return false;
+    if((s.onb_goalKind==='uni'||s.onb_goalKind==='curso') && !String(s.onb_goalText||'').trim()) return false;
+    return true;
+  }
+  if(s.onboardStep===1) return !!s.onb_level;
+  if(s.onboardStep===2) return !!s.onb_time;
+  return false;
+}
+function onbGoalLabel(){
+  const s=App.s, k=s.onb_goalKind, txt=String(s.onb_goalText||'').trim();
+  if(k==='enem') return 'ENEM 2026';
+  if(k==='uni') return txt || 'Universidade';
+  if(k==='curso') return txt ? (txt+' 🎯') : 'Curso';
+  return 'Explorando';
+}
+function onbNext(){
+  if(!onbCanContinue()){ toast('Escolha uma opção pra continuar 🙂','warn','👆'); return; }
+  if(App.s.onboardStep < 2){ App.s.onboardStep++; render(); return; }
+  // finalizar
+  App.s.goal = onbGoalLabel();
+  if(App.s.onb_goalKind==='uni'){ const m=EXAMS.find(e=>String(App.s.onb_goalText).toLowerCase().includes(e.id)||String(App.s.onb_goalText).toUpperCase().includes(e.sigla)); if(m) App.s.exam=m.id; }
+  App.s.onboardStep = 0;
+  toast('Perfil criado! Bem-vindo à Flipei 🎉','success','✨');
+  confetti({count:130, y:innerHeight*0.4});
+  go('home');
+}
+
 function Onboarding(){
-  const step = App.s.onboardStep;
-  const steps = [
-    { eyebrow:'Passo 1 de 3', title:'Qual é o seu objetivo?', sub:'Vamos personalizar seus flashcards para isso.', opts:ONB_GOALS, key:'goal' },
-    { eyebrow:'Passo 2 de 3', title:'Como está sua rotina hoje?', sub:'Sem julgamentos — só pra começar do jeito certo.', opts:ONB_LEVELS, key:'level' },
-    { eyebrow:'Passo 3 de 3', title:'Sua meta diária', sub:'Estudar pouco e todo dia vale mais que maratonar.', opts:ONB_TIME, key:'time' },
-  ][step];
-  const chosen = App.s['onb_'+steps.key];
+  const s = App.s, step = s.onboardStep;
+  let title, sub, body;
+  if(step===0){
+    title='O que você quer conquistar?'; sub='Sem pressuposições — você escolhe (e pode digitar).';
+    const k = s.onb_goalKind;
+    let extra='';
+    if(k==='uni' || k==='curso'){
+      const list = k==='uni'?UNI_SUGGEST:CURSO_SUGGEST;
+      const ph = k==='uni'?'Digite a universidade (ex.: UFSC)':'Digite o curso (ex.: Veterinária)';
+      extra = `
+        <div class="onb-input-wrap slide-in">
+          <div class="tiny faint b">${k==='uni'?'Qual universidade?':'Qual curso?'}</div>
+          <input class="onb-input" data-model="onb_goalText" value="${esc(s.onb_goalText)}" placeholder="${ph}" />
+          <div class="row wrap gap8 mt8">
+            ${list.map(x=>`<button class="opt-chip ${s.onb_goalText===x?'on':''}" data-act="onb-suggest" data-val="${esc(x)}">${x}</button>`).join('')}
+          </div>
+        </div>`;
+    }
+    body = `
+      <div class="col gap10">
+        ${GOAL_KINDS.map(o=>`
+          <button class="choice ${k===o.id?'sel':''}" data-act="onb-pick" data-val="${o.id}">
+            <div class="emoji">${o.emoji}</div>
+            <div class="col"><div class="b9" style="font-size:16px">${o.t}</div><div class="small muted">${o.d}</div></div>
+            <div class="grow"></div><div style="font-size:20px;color:var(--roxo-500)">${k===o.id?'✓':''}</div>
+          </button>`).join('')}
+      </div>${extra}`;
+  } else if(step===1){
+    title='Como está sua rotina hoje?'; sub='Sem julgamentos — só pra começar do jeito certo.';
+    body = `<div class="col gap10">${LEVELS.map(o=>`
+      <button class="choice ${s.onb_level===o.id?'sel':''}" data-act="onb-level" data-val="${o.id}">
+        <div class="emoji">${o.emoji}</div><div class="col"><div class="b9" style="font-size:16px">${o.t}</div><div class="small muted">${o.d}</div></div>
+        <div class="grow"></div><div style="font-size:20px;color:var(--roxo-500)">${s.onb_level===o.id?'✓':''}</div></button>`).join('')}</div>`;
+  } else {
+    title='Sua meta diária'; sub='Estudar pouco e todo dia vale mais que maratonar.';
+    body = `<div class="col gap10">${TIMES.map(o=>`
+      <button class="choice ${s.onb_time===o.id?'sel':''}" data-act="onb-time" data-val="${o.id}">
+        <div class="emoji">${o.emoji}</div><div class="col"><div class="b9" style="font-size:16px">${o.t}</div><div class="small muted">${o.d}</div></div>
+        <div class="grow"></div><div style="font-size:20px;color:var(--roxo-500)">${s.onb_time===o.id?'✓':''}</div></button>`).join('')}</div>`;
+  }
   return `
-  <div class="stage">
-    <div class="phone">
-      <div class="phone-notch"></div>
-      <div class="onb fade-in">
-        <div class="topbar">
-          <button class="icon-btn" id="onb-back">←</button>
-          <div class="bar roxo thin grow" style="max-width:200px"><span style="width:${(step+1)/3*100}%"></span></div>
-          <div style="width:42px"></div>
-        </div>
-        <div style="padding:8px 22px 0;">
-          <div class="eyebrow">${steps.eyebrow}</div>
-          <div class="h2 mt4">${steps.title}</div>
-          <p class="muted b mt4">${steps.sub}</p>
-        </div>
-        <div class="scroll" style="flex:1;padding:18px 22px;display:flex;flex-direction:column;gap:12px;">
-          ${steps.opts.map(o=>`
-            <button class="choice ${chosen===o.id?'sel':''}" data-opt="${o.id}">
-              <div class="emoji">${o.emoji}</div>
-              <div class="col"><div class="b9" style="font-size:16px">${o.t}</div><div class="small muted">${o.d}</div></div>
-              <div class="grow"></div>
-              <div style="font-size:20px;color:var(--roxo-500)">${chosen===o.id?'✓':''}</div>
-            </button>`).join('')}
-        </div>
-        <div class="section">
-          <button class="btn btn-roxo btn-block btn-lg" id="onb-next" ${chosen?'':'disabled'}>${step<2?'Continuar':'Criar meu perfil'}</button>
-        </div>
-      </div>
+  <div class="onb">
+    <div class="topbar">
+      <button class="icon-btn" data-act="onb-back">←</button>
+      <div class="bar roxo thin grow" style="max-width:200px"><span style="width:${(step+1)/3*100}%"></span></div>
+      <div style="width:42px"></div>
+    </div>
+    <div style="padding:8px 22px 0;">
+      <div class="eyebrow">Passo ${step+1} de 3</div>
+      <div class="h2 mt4">${title}</div>
+      <p class="muted b mt4">${sub}</p>
+    </div>
+    <div class="scroll" style="flex:1;padding:18px 22px;">${body}</div>
+    <div class="section">
+      <button class="btn btn-roxo btn-block btn-lg" id="onb-next" data-act="onb-next" ${onbCanContinue()?'':'disabled'}>${step<2?'Continuar':'Criar meu perfil'}</button>
     </div>
   </div>`;
 }
 
-function bindOnboarding(){
-  const step = App.s.onboardStep;
-  const key = ['goal','level','time'][step];
-  $('.choice[data-opt]').forEach(c=> c.addEventListener('click', ()=>{
-    App.s['onb_'+key] = c.dataset.opt;
-    render();
-  }));
-  $('#onb-back').addEventListener('click', ()=>{
-    if(step===0){ App.s.onboardStep=0; go('splash'); }
-    else { App.s.onboardStep--; render(); }
-  });
-  $('#onb-next').addEventListener('click', ()=>{
-    if(step<2){ App.s.onboardStep++; render(); }
-    else {
-      App.s.onboardStep=0;
-      toast('Perfil criado! Bem-vindo à Flipei 🎉','success','✨');
-      confetti({count:120, y: innerHeight*0.4});
-      go('home');
-    }
-  });
-}
-
 // =========================================================================
-// HOME — Trilha de estudos + status do dia
+// HOME — trilha + status (sem vidas)
 // =========================================================================
 function Home(){
   const s = App.s;
@@ -1085,121 +1209,93 @@ function Home(){
   return `
   <div>
     <div class="topbar">
-      <div class="brand-mini">${Logo(20)}</div>
+      <div>${Logo(24)}</div>
       <div class="row gap8">
         <span class="tag-stat tag-streak">🔥 ${s.streak}</span>
+        <span class="tag-stat tag-xp">⚡ ${s.xp.toLocaleString('pt-BR')}</span>
         <span class="tag-stat tag-gem">💎 ${s.gems}</span>
-        <span class="tag-stat tag-life">❤️ ${s.lives}</span>
       </div>
     </div>
 
-    <!-- Meta diária -->
     <div class="section">
       <div class="card pad">
         <div class="row between">
-          <div>
-            <div class="eyebrow">Meta de hoje</div>
-            <div class="h3">${s.xpToday} / ${STUDENT.dailyGoal} XP</div>
-          </div>
+          <div><div class="eyebrow">Meta de hoje</div><div class="h3">${s.xpToday} / ${STUDENT.dailyGoal} XP</div></div>
           <div class="pill ${pct>=100?'green':''}">${pct>=100?'Concluída! 🎉':pct+'%'}</div>
         </div>
         <div class="bar xp mt12"><span style="width:${pct}%"></span></div>
         <div class="row between mt8">
-          <span class="small muted b">Objetivo: <b style="color:var(--roxo-700)">${s.goal}</b></span>
+          <span class="small muted b">Objetivo: <b style="color:var(--roxo-700)">${esc(s.goal)}</b></span>
           <span class="small b" style="color:var(--laranja-600)">🔥 ${s.streak} dias seguidos</span>
         </div>
       </div>
     </div>
 
-    <!-- CTA principal -->
     <div class="section">
-      <button class="btn btn-roxo btn-block btn-lg" data-go="game">▶  Estudar agora</button>
+      <button class="btn btn-roxo btn-block btn-lg" data-act="go" data-route="game">▶  Estudar agora</button>
       <div class="row gap10 mt12">
-        <button class="btn btn-outline grow btn-sm" data-go="game">⚡ Revisão rápida</button>
-        <button class="btn btn-outline grow btn-sm" data-go="personalize">🎯 Mudar foco</button>
+        <button class="btn btn-outline grow btn-sm" data-act="go" data-route="game">⚡ Revisão rápida</button>
+        <button class="btn btn-outline grow btn-sm" data-act="go" data-route="personalize">🎯 Mudar foco</button>
       </div>
     </div>
 
-    <!-- Trilha -->
     <div class="section">
       <div class="unit-banner">
-        <div class="col">
-          <span class="tiny b" style="opacity:.85;text-transform:uppercase;letter-spacing:.5px">Sua trilha</span>
-          <span class="h3" style="color:#fff">${PATH.unit}</span>
-        </div>
+        <div class="col"><span class="tiny b" style="opacity:.85;text-transform:uppercase;letter-spacing:.5px">Sua trilha</span>
+          <span class="h3" style="color:#fff">${PATH.unit}</span></div>
         <div style="font-size:34px">🧬</div>
       </div>
-
       <div class="path">
-        ${PATH.nodes.map((n,i)=>{
-          const off = [0,38,-30,30,-22,0][i] || 0;
+        ${PATH.nodes.map((n,i)=>{ const off=[0,38,-30,30,-22,0][i]||0;
           return `<div class="node ${n.state}" style="transform:translateX(${off}px)">
             ${n.state==='current'?`<div class="start-here">COMECE AQUI</div>`:''}
             ${n.state==='done'?`<div class="crown">👑</div>`:''}
-            <button class="bubble" ${n.state!=='locked'?'data-go="game"':''}>${n.ic}</button>
-            <div class="label">${n.label}</div>
-          </div>`;
-        }).join('')}
+            <button class="bubble" ${n.state!=='locked'?'data-act="go" data-route="game"':''}>${n.ic}</button>
+            <div class="label">${n.label}</div></div>`; }).join('')}
       </div>
     </div>
 
-    <!-- Desafio social -->
     <div class="section">
       <div class="card pad" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA">
-        <div class="row gap12">
-          <div style="font-size:34px">⚔️</div>
-          <div class="grow">
-            <div class="b9">Desafio relâmpago</div>
-            <div class="small muted b">Ana te desafiou: 20 cards de Biologia. Faltam <b>4h</b>!</div>
-          </div>
-          <button class="btn btn-amarelo btn-sm" data-go="game">Aceitar</button>
-        </div>
+        <div class="row gap12"><div style="font-size:34px">⚔️</div>
+          <div class="grow"><div class="b9">Desafio relâmpago</div><div class="small muted b">Ana te desafiou: 20 cards de Biologia. Faltam <b>4h</b>!</div></div>
+          <button class="btn btn-amarelo btn-sm" data-act="go" data-route="game">Aceitar</button></div>
       </div>
     </div>
     <div class="empty-space"></div>
   </div>`;
 }
 
-function bindHome(){
-  // count up nothing special; CTA handled by data-go
-}
-
 // =========================================================================
-// GAME — sessão de flashcards
+// GAME — flashcards (sem vidas; erro só agenda revisão)
 // =========================================================================
 function startDeck(){
-  // build deck from selected subjects, fallback to all
   let pool = CARDS.filter(c=> App.s.selectedSubjects.includes(c.s));
   if(pool.length < 6) pool = CARDS.slice();
-  // shuffle
-  pool = pool.slice().sort(()=>Math.random()-0.5).slice(0, 8);
-  App.s.deck = pool.map(c=>({ ...c, flipped:false, rated:false }));
-  App.s.deckIndex = 0;
-  App.s.combo = 0;
-  App.s.sessionCorrect = 0;
-  App.s.sessionTotal = 0;
-  App.s.sessionXp = 0;
+  pool = pool.slice().sort(()=>Math.random()-0.5).slice(0,8);
+  App.s.deck = pool.map(c=>({ ...c }));
+  App.s.deckIndex=0; App.s.revealed=false; App.s.combo=0;
+  App.s.sessionCorrect=0; App.s.sessionTotal=0; App.s.sessionXp=0;
 }
 
 function Game(){
-  if(!App.s.deck.length || App.s.deckIndex===0 && App.params.fresh!==false){
-    if(!App.s.deck.length) startDeck();
-  }
+  if(!App.s.deck.length) startDeck();
   const idx = App.s.deckIndex;
   const card = App.s.deck[idx];
   const subj = SUBJECTS[card.s];
   const pct = Math.round(idx / App.s.deck.length * 100);
+  const flipped = App.s.revealed;
   return `
   <div class="game">
     <div class="game-top">
-      <button class="icon-btn" id="game-quit" style="background:#F1EFF6;color:var(--ink-soft)">✕</button>
+      <button class="icon-btn" data-act="quit" style="background:#F1EFF6;color:var(--ink-soft)">✕</button>
       <div class="bar"><span style="width:${pct}%"></span></div>
-      <span class="tag-stat tag-life" style="font-size:13px">❤️ ${App.s.lives}</span>
+      <span class="pill small">${idx+1}/${App.s.deck.length}</span>
     </div>
-    <div class="combo ${App.s.combo>=2?'show':''}" id="combo">🔥 Combo x${App.s.combo}</div>
+    ${App.s.combo>=2?`<div class="combo show">🔥 Combo x${App.s.combo}</div>`:''}
 
     <div class="card-area">
-      <div class="flashcard" id="flashcard">
+      <div class="flashcard ${flipped?'flipped':''}" ${flipped?'':'data-act="reveal"'}>
         <div class="face front">
           <span class="subject-tag pill" style="background:${subj.color}1a;color:${subj.color}">${subj.emoji} ${subj.name} · ${card.sub}</span>
           <div class="q">${card.q}</div>
@@ -1213,78 +1309,37 @@ function Game(){
       </div>
     </div>
 
-    <div id="game-actions">
-      <div class="reveal-hint" id="reveal-hint">
-        <button class="btn btn-roxo btn-block btn-lg" id="reveal-btn">Mostrar resposta</button>
-      </div>
-    </div>
+    ${flipped ? `
+      <div class="rate-grid slide-in">
+        <button class="rate err"  data-act="rate" data-rate="0"><span class="ic">😵</span>Errei<span class="when">rever já</span></button>
+        <button class="rate hard" data-act="rate" data-rate="1"><span class="ic">😬</span>Difícil<span class="when">1 dia</span></button>
+        <button class="rate good" data-act="rate" data-rate="2"><span class="ic">🙂</span>Bom<span class="when">3 dias</span></button>
+        <button class="rate easy" data-act="rate" data-rate="3"><span class="ic">😎</span>Fácil<span class="when">7 dias</span></button>
+      </div>` : `
+      <div class="reveal-hint"><button class="btn btn-roxo btn-block btn-lg" data-act="reveal">Mostrar resposta</button></div>`}
   </div>`;
 }
 
-function rateButtons(){
-  return `
-  <div class="rate-grid slide-in">
-    <button class="rate err" data-rate="0"><span class="ic">😵</span>Errei<span class="when">&lt; 10min</span></button>
-    <button class="rate hard" data-rate="1"><span class="ic">😬</span>Difícil<span class="when">1 dia</span></button>
-    <button class="rate good" data-rate="2"><span class="ic">🙂</span>Bom<span class="when">3 dias</span></button>
-    <button class="rate easy" data-rate="3"><span class="ic">😎</span>Fácil<span class="when">7 dias</span></button>
-  </div>`;
-}
-
-function bindGame(){
-  const fc = $('#flashcard');
-  const flip = ()=>{
-    fc.classList.add('flipped');
-    const actions = $('#game-actions');
-    actions.innerHTML = rateButtons();
-    bindRates();
-  };
-  $('#reveal-btn') && $('#reveal-btn').addEventListener('click', flip);
-  fc.addEventListener('click', ()=>{ if(!fc.classList.contains('flipped')) flip(); });
-  $('#game-quit').addEventListener('click', ()=>{
-    if(confirm('Sair da sessão? Seu progresso desta sessão será perdido.')){ App.s.deck=[]; go('home'); }
-  });
-
-  function bindRates(){
-    $('.rate[data-rate]').forEach(b=> b.addEventListener('click', ()=> answer(parseInt(b.dataset.rate), b)));
+function gameAnswer(rating, btn){
+  const correct = rating >= 2;
+  App.s.sessionTotal++;
+  if(correct){
+    App.s.sessionCorrect++; App.s.combo++;
+    const base = rating===3?12:10, bonus=Math.min(App.s.combo,5)*2, gain=base+bonus;
+    App.s.sessionXp += gain; floatXp(gain, btn);
+    if(App.s.combo>=3) toast(`Combo x${App.s.combo}! +${bonus} XP de bônus 🔥`,'warn','🔥');
+  } else {
+    App.s.combo=0; toast('Tranquilo — esse volta logo pra você revisar 💪','brand','📌');
   }
-
-  function answer(rating, btn){
-    const correct = rating >= 2;       // Bom/Fácil = acerto
-    App.s.sessionTotal++;
-    if(correct){
-      App.s.sessionCorrect++;
-      App.s.combo++;
-      const base = rating===3 ? 12 : 10;
-      const bonus = Math.min(App.s.combo, 5) * 2;     // combo bonus
-      const gain = base + bonus;
-      App.s.sessionXp += gain;
-      floatXp(gain, btn);
-      if(App.s.combo>=3) toast(`Combo x${App.s.combo}! +${bonus} XP de bônus 🔥`,'warn','🔥');
-    } else {
-      App.s.combo = 0;
-      App.s.lives = Math.max(0, App.s.lives-1);
-      toast('Sem problema — vamos revisar em breve 💪','brand','📌');
-    }
-    // advance
-    App.s.deckIndex++;
-    if(App.s.deckIndex >= App.s.deck.length || App.s.lives<=0){
-      finishSession();
-    } else {
-      render();
-    }
-  }
-
-  function finishSession(){
-    App.s.xp += App.s.sessionXp;
-    App.s.xpToday += App.s.sessionXp;
-    if(App.s.sessionCorrect>0 && App.s.combo>=0){ /* keep streak */ }
+  App.s.deckIndex++; App.s.revealed=false;
+  if(App.s.deckIndex >= App.s.deck.length){
+    App.s.xp += App.s.sessionXp; App.s.xpToday += App.s.sessionXp;
     go('complete');
-  }
+  } else render();
 }
 
 // =========================================================================
-// COMPLETE — resumo gamificado da sessão
+// COMPLETE
 // =========================================================================
 function Complete(){
   const acc = App.s.sessionTotal ? Math.round(App.s.sessionCorrect/App.s.sessionTotal*100) : 0;
@@ -1293,53 +1348,29 @@ function Complete(){
   <div class="complete fade-in">
     <div class="trophy">${perfect?'🏆':'🎉'}</div>
     <div class="h1">${perfect?'Sessão perfeita!':'Mandou bem!'}</div>
-    <p class="muted b" style="max-width:300px">${perfect?'Você acertou tudo. A IA já marcou esses cards como dominados.':'Cada sessão te deixa mais perto do seu objetivo.'}</p>
-
+    <p class="muted b" style="max-width:300px">${perfect?'Você acertou tudo. A IA marcou esses cards como dominados.':'Cada sessão te deixa mais perto do seu objetivo.'}</p>
     <div class="stat-cards mt20">
-      <div class="stat-tile" style="background:var(--grad-xp)">
-        <div class="v" id="c-xp">0</div><div class="k">⚡ XP ganho</div>
-      </div>
-      <div class="stat-tile" style="background:var(--grad-verde)">
-        <div class="v">${acc}%</div><div class="k">🎯 Acerto</div>
-      </div>
-      <div class="stat-tile" style="background:var(--grad-streak)">
-        <div class="v">🔥 ${App.s.streak}</div><div class="k">Streak mantido</div>
-      </div>
-      <div class="stat-tile" style="background:var(--grad-roxo)">
-        <div class="v">${App.s.sessionTotal}</div><div class="k">📇 Cards revisados</div>
-      </div>
+      <div class="stat-tile" style="background:var(--grad-xp)"><div class="v" id="c-xp">0</div><div class="k">⚡ XP ganho</div></div>
+      <div class="stat-tile" style="background:var(--grad-verde)"><div class="v">${acc}%</div><div class="k">🎯 Acerto</div></div>
+      <div class="stat-tile" style="background:var(--grad-streak)"><div class="v">🔥 ${App.s.streak}</div><div class="k">Streak mantido</div></div>
+      <div class="stat-tile" style="background:var(--grad-brand)"><div class="v">${App.s.sessionTotal}</div><div class="k">📇 Cards revisados</div></div>
     </div>
-
     <div class="card pad mt20" style="width:100%">
-      <div class="row between">
-        <span class="b">Meta diária</span>
-        <span class="b" style="color:var(--roxo-700)">${App.s.xpToday}/${STUDENT.dailyGoal} XP</span>
-      </div>
+      <div class="row between"><span class="b">Meta diária</span><span class="b" style="color:var(--roxo-700)">${App.s.xpToday}/${STUDENT.dailyGoal} XP</span></div>
       <div class="bar xp mt8"><span style="width:${Math.min(100,App.s.xpToday/STUDENT.dailyGoal*100)}%"></span></div>
     </div>
-
     <div style="width:100%;margin-top:20px;display:flex;flex-direction:column;gap:10px">
-      <button class="btn btn-verde btn-block btn-lg" data-go="game">Continuar estudando</button>
-      <button class="btn btn-ghost btn-block" data-go="home">Voltar ao início</button>
+      <button class="btn btn-verde btn-block btn-lg" data-act="go" data-route="game">Continuar estudando</button>
+      <button class="btn btn-ghost btn-block" data-act="go" data-route="home">Voltar ao início</button>
     </div>
   </div>`;
 }
 
-function bindComplete(){
-  confetti({count:160, y: innerHeight*0.32});
-  const xpNode = $('#c-xp');
-  if(xpNode) countUp(xpNode, App.s.sessionXp, 1000);
-  // reset deck for next session
-  App.s.deck = [];
-}
-
 // =========================================================================
-// RANKING — Ligas (geral / prova / escola)
+// RANKING
 // =========================================================================
 function Ranking(){
-  const tab = App.s.rankTab;
-  const list = RANK[tab];
-  const promoteAt = 3; // top 3 sobem de liga
+  const tab = App.s.rankTab, list = RANK[tab], promoteAt = 3;
   return `
   <div>
     <div class="league-head">
@@ -1349,39 +1380,29 @@ function Ranking(){
     </div>
     <div class="section" style="padding-top:14px">
       <div class="seg">
-        <button class="${tab==='geral'?'on':''}" data-rank="geral">🌐 Geral</button>
-        <button class="${tab==='prova'?'on':''}" data-rank="prova">📝 Por prova</button>
-        <button class="${tab==='escola'?'on':''}" data-rank="escola">🏫 Escola</button>
+        <button class="${tab==='geral'?'on':''}" data-act="rank-tab" data-tab="geral">🌐 Geral</button>
+        <button class="${tab==='prova'?'on':''}" data-act="rank-tab" data-tab="prova">📝 Por prova</button>
+        <button class="${tab==='escola'?'on':''}" data-act="rank-tab" data-tab="escola">🏫 Escola</button>
       </div>
       <p class="tiny faint mt8 tcenter">${tab==='geral'?'Todos os estudantes da Flipei':tab==='prova'?'Quem está focado no ENEM como você':'Alunos do '+STUDENT.school}</p>
     </div>
-
     <div class="section" style="display:flex;flex-direction:column;gap:9px;">
-      ${list.map((u,i)=>{
-        const pos = i+1;
-        const top = pos<=3 ? 'top'+pos : '';
-        const medal = pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos;
-        const html = `<div class="rank-row ${u.me?'me':''} ${top}">
+      ${list.map((u,i)=>{ const pos=i+1, top=pos<=3?'top'+pos:'', medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos;
+        const html=`<div class="rank-row ${u.me?'me':''} ${top}">
           <div class="rank-pos">${medal}</div>
           <div class="avatar" style="background:${u.av};width:40px;height:40px;font-size:15px">${u.name[0]}</div>
           <div class="grow"><div class="b9">${u.name}${u.me?' <span class="pill" style="padding:2px 8px;font-size:11px">você</span>':''}</div>
             <div class="tiny faint b">Nível ${14-i>0?14-i:1}</div></div>
-          <div class="tag-stat tag-xp" style="font-size:14px">${u.xp.toLocaleString('pt-BR')}</div>
-        </div>`;
-        const sep = (pos===promoteAt) ? `${html}<div class="promo-line">Zona de promoção ⬆️</div>` : html;
-        return sep;
+          <div class="tag-stat tag-xp" style="font-size:14px">${u.xp.toLocaleString('pt-BR')}</div></div>`;
+        return pos===promoteAt ? `${html}<div class="promo-line">Zona de promoção ⬆️</div>` : html;
       }).join('')}
     </div>
     <div class="empty-space"></div>
   </div>`;
 }
 
-function bindRanking(){
-  $('[data-rank]').forEach(b=> b.addEventListener('click', ()=>{ App.s.rankTab=b.dataset.rank; render(); }));
-}
-
 // =========================================================================
-// PERSONALIZE — prova, universidade, matéria, submatéria + IA
+// PERSONALIZE
 // =========================================================================
 function Personalize(){
   const s = App.s;
@@ -1389,99 +1410,92 @@ function Personalize(){
   <div>
     <div class="topbar"><div class="h3">🎯 Personalizar estudos</div></div>
     <p class="hr-pad muted b small" style="margin-top:-4px">Você no controle: a Flipei entrega flashcards do que importa pra você.</p>
-
-    <!-- IA highlight -->
     <div class="section" style="padding-top:14px">
-      <div class="ai-card">
-        <div class="spark">✨</div>
+      <div class="ai-card"><div class="spark">✨</div>
         <div class="pill" style="background:rgba(255,255,255,.18);color:#fff">🤖 Sugestão da IA</div>
         <div class="h3 mt8" style="color:#fff">Foque em Física e Matemática</div>
-        <p class="small" style="opacity:.92;font-weight:700;margin-top:4px">Analisamos as últimas provas do ENEM + seu desempenho. Esses temas caem muito e são onde você mais erra.</p>
-        <button class="btn btn-amarelo btn-sm mt12" data-go="game">Treinar pontos fracos</button>
+        <p class="small" style="opacity:.92;font-weight:700;margin-top:4px">Analisamos as últimas provas + seu desempenho. Esses temas caem muito e são onde você mais erra.</p>
+        <button class="btn btn-amarelo btn-sm mt12" data-act="go" data-route="game">Treinar pontos fracos</button>
       </div>
     </div>
-
-    <!-- Prova / universidade -->
     <div class="section">
       <div class="eyebrow">Sua prova / universidade</div>
       <div class="col gap10 mt8">
-        ${EXAMS.map(e=>`
-          <div class="uni-card ${s.exam===e.id?'on':''}" data-exam="${e.id}">
-            <div class="uni-logo" style="background:${e.color}">${e.sigla}</div>
-            <div class="grow"><div class="b9">${e.name}</div><div class="small muted">${e.sub}</div></div>
-            <div style="font-size:20px;color:var(--roxo-500)">${s.exam===e.id?'✓':'○'}</div>
-          </div>`).join('')}
+        ${EXAMS.map(e=>`<div class="uni-card ${s.exam===e.id?'on':''}" data-act="set-exam" data-exam="${e.id}">
+          <div class="uni-logo" style="background:${e.color}">${e.sigla}</div>
+          <div class="grow"><div class="b9">${e.name}</div><div class="small muted">${e.sub}</div></div>
+          <div style="font-size:20px;color:var(--roxo-500)">${s.exam===e.id?'✓':'○'}</div></div>`).join('')}
       </div>
     </div>
-
-    <!-- Matérias -->
     <div class="section">
       <div class="eyebrow">Matérias no seu foco</div>
       <p class="tiny faint b">Toque para ativar/desativar. Você recebe mais cards do que escolher.</p>
       <div class="row wrap gap8 mt8">
-        ${Object.values(SUBJECTS).map(sub=>`
-          <button class="opt-chip ${s.selectedSubjects.includes(sub.id)?'on':''}" data-subj="${sub.id}">${sub.emoji} ${sub.name}</button>`).join('')}
+        ${Object.values(SUBJECTS).map(sub=>`<button class="opt-chip ${s.selectedSubjects.includes(sub.id)?'on':''}" data-act="toggle-subj" data-subj="${sub.id}">${sub.emoji} ${sub.name}</button>`).join('')}
       </div>
     </div>
-
-    <!-- Submatéria / tema -->
     <div class="section">
       <div class="eyebrow">Aprofundar em um tema</div>
       <div class="card pad mt8">
         <div class="row between"><span class="b">Biologia</span><span class="link">trocar</span></div>
         <div class="row wrap gap8 mt8">
-          <span class="pill">Citologia</span>
-          <span class="pill outline">Genética</span>
-          <span class="pill outline">Ecologia</span>
-          <span class="pill outline">Evolução</span>
-          <span class="pill outline">+ temas</span>
+          <span class="pill">Citologia</span><span class="pill outline">Genética</span><span class="pill outline">Ecologia</span><span class="pill outline">Evolução</span><span class="pill outline">+ temas</span>
         </div>
-        <button class="btn btn-outline btn-block btn-sm mt12" data-go="game">Estudar só "Citologia"</button>
+        <button class="btn btn-outline btn-block btn-sm mt12" data-act="go" data-route="game">Estudar só "Citologia"</button>
       </div>
     </div>
     <div class="empty-space"></div>
   </div>`;
 }
 
-function bindPersonalize(){
-  $('[data-exam]').forEach(c=> c.addEventListener('click', ()=>{ App.s.exam=c.dataset.exam; const e=EXAMS.find(x=>x.id===c.dataset.exam); App.s.goal=e.name; toast('Foco atualizado: '+e.name,'success','🎯'); render(); }));
-  $('[data-subj]').forEach(c=> c.addEventListener('click', ()=>{
-    const id=c.dataset.subj; const arr=App.s.selectedSubjects;
-    if(arr.includes(id)){ if(arr.length>1) App.s.selectedSubjects=arr.filter(x=>x!==id); else toast('Escolha ao menos 1 matéria','warn','⚠️'); }
-    else App.s.selectedSubjects=[...arr,id];
-    render();
-  }));
-}
-
 // =========================================================================
-// PROFILE — dashboard do aluno (evolução, acertos, conquistas)
+// PROFILE — dashboard + vínculo com escola
 // =========================================================================
 function Profile(){
   const s = App.s;
   const subjData = STUDENT.bySubject.map(x=>({ l:SUBJECTS[x.s].name, v:x.acc, color:SUBJECTS[x.s].color }));
   const weekData = STUDENT.weeklyXp.map((v,i)=>({ l:['S','T','Q','Q','S','S','D'][i], v }));
-  const dias = STUDENT.heat;
+  const linked = s.linkedSchool;
   return `
   <div>
-    <!-- header -->
-    <div style="background:var(--grad-roxo);padding:22px 18px 26px;color:#fff;border-radius:0 0 26px 26px;">
+    <div style="background:var(--grad-brand);padding:22px 18px 26px;color:#fff;border-radius:0 0 26px 26px;">
       <div class="row between">
         <div class="row gap12">
           <div class="avatar" style="background:#fff;color:var(--roxo-700);width:56px;height:56px;font-size:24px">${STUDENT.name[0]}</div>
           <div><div class="h3" style="color:#fff">${STUDENT.name}</div>
-            <div class="small" style="opacity:.9;font-weight:800">${STUDENT.handle} · ${STUDENT.school}</div></div>
+            <div class="small" style="opacity:.9;font-weight:800">${STUDENT.handle}${linked?' · '+esc(linked):''}</div></div>
         </div>
         <button class="icon-btn" style="background:rgba(255,255,255,.18);color:#fff">⚙️</button>
       </div>
       <div class="row gap8 mt16">
         <div class="grow tcenter" style="background:rgba(255,255,255,.14);border-radius:14px;padding:10px"><div class="h3" style="color:#fff">🔥 ${s.streak}</div><div class="tiny b" style="opacity:.9">dias</div></div>
-        <div class="grow tcenter" style="background:rgba(255,255,255,.14);border-radius:14px;padding:10px"><div class="h3" style="color:#fff">${(s.xp).toLocaleString('pt-BR')}</div><div class="tiny b" style="opacity:.9">XP total</div></div>
+        <div class="grow tcenter" style="background:rgba(255,255,255,.14);border-radius:14px;padding:10px"><div class="h3" style="color:#fff">${s.xp.toLocaleString('pt-BR')}</div><div class="tiny b" style="opacity:.9">XP total</div></div>
         <div class="grow tcenter" style="background:rgba(255,255,255,.14);border-radius:14px;padding:10px"><div class="h3" style="color:#fff">${STUDENT.leagueIcon}</div><div class="tiny b" style="opacity:.9">Liga ${STUDENT.league}</div></div>
       </div>
     </div>
 
-    <!-- KPIs -->
+    <!-- Vínculo com a escola -->
     <div class="section" style="padding-top:16px">
+      ${linked ? `
+        <div class="card pad" style="border-color:var(--verde-300);background:var(--verde-100)">
+          <div class="row gap12">
+            <div style="font-size:30px">🏫</div>
+            <div class="grow"><div class="b9">Conectado a ${esc(linked)}</div>
+              <div class="small muted b">Sua escola acompanha seu progresso. Ela vê desempenho — nunca interfere no seu app.</div></div>
+            <button class="btn btn-outline btn-sm" data-act="unlink">Desvincular</button>
+          </div>
+        </div>` : `
+        <div class="card pad" style="border:2px dashed var(--roxo-300);background:var(--roxo-50)">
+          <div class="row gap12">
+            <div style="font-size:30px">🏫</div>
+            <div class="grow"><div class="b9">Sua escola é parceira Flipei?</div>
+              <div class="small muted b">Peça o <b>código do professor</b> e conecte sua conta. Você continua usando o app livremente.</div></div>
+          </div>
+          <button class="btn btn-roxo btn-block btn-sm mt12" data-act="link-open">🔗 Conectar à minha escola</button>
+        </div>`}
+    </div>
+
+    <div class="section">
       <div class="eyebrow">Visão geral</div>
       <div class="row gap10 mt8">
         <div class="kpi grow tcenter"><div class="v" style="color:var(--verde-600)">${STUDENT.accuracy}%</div><div class="k">Acerto geral</div></div>
@@ -1490,59 +1504,79 @@ function Profile(){
       </div>
     </div>
 
-    <!-- Evolução semanal -->
-    <div class="section">
-      <div class="card pad">
-        <div class="row between"><div class="b9">📈 Evolução de XP</div><span class="pill green">↑ esta semana</span></div>
-        ${barChart(weekData, { h:170, values:true })}
-      </div>
-    </div>
+    <div class="section"><div class="card pad">
+      <div class="row between"><div class="b9">📈 Evolução de XP</div><span class="pill green">↑ esta semana</span></div>
+      ${barChart(weekData,{h:170,values:true})}
+    </div></div>
 
-    <!-- Desempenho por matéria -->
-    <div class="section">
-      <div class="card pad">
-        <div class="b9">🎯 Acerto por matéria</div>
-        <p class="tiny faint b">Onde você brilha e onde precisa de reforço.</p>
-        <div class="mt8">${hBars(subjData, {})}</div>
-        <div class="insight mt8" style="border-color:var(--laranja-500);background:var(--laranja-100)">
-          <span class="small b" style="color:var(--laranja-600)">💡 Física (59%) é seu ponto mais fraco. Que tal 10 cards agora?</span>
-        </div>
-      </div>
-    </div>
+    <div class="section"><div class="card pad">
+      <div class="b9">🎯 Acerto por matéria</div><p class="tiny faint b">Onde você brilha e onde precisa de reforço.</p>
+      <div class="mt8">${hBars(subjData,{})}</div>
+      <div class="insight mt8" style="border-color:var(--laranja-500);background:var(--laranja-100)">
+        <span class="small b" style="color:var(--laranja-600)">💡 Física (59%) é seu ponto mais fraco. Que tal 10 cards agora?</span></div>
+    </div></div>
 
-    <!-- Calendário de constância -->
-    <div class="section">
-      <div class="card pad">
-        <div class="row between"><div class="b9">🗓️ Constância</div><span class="small b muted">${STUDENT.streak} dias seguidos 🔥</span></div>
-        <div class="cal mt12">
-          ${dias.map(l=>`<div class="d l${l}"></div>`).join('')}
-        </div>
-        <div class="row gap8 mt8" style="justify-content:flex-end"><span class="tiny faint b">menos</span>
-          <div class="cal" style="grid-template-columns:repeat(5,12px);gap:3px;width:auto">
-          <div class="d"></div><div class="d l1"></div><div class="d l2"></div><div class="d l3"></div><div class="d l4"></div></div>
-          <span class="tiny faint b">mais</span></div>
-      </div>
-    </div>
+    <div class="section"><div class="card pad">
+      <div class="row between"><div class="b9">🗓️ Constância</div><span class="small b muted">${s.streak} dias seguidos 🔥</span></div>
+      <div class="cal mt12">${STUDENT.heat.map(l=>`<div class="d l${l}"></div>`).join('')}</div>
+    </div></div>
 
-    <!-- Conquistas -->
     <div class="section">
       <div class="row between"><div class="b9">🏅 Conquistas</div><span class="link">ver todas</span></div>
       <div class="col gap8 mt8">
-        ${STUDENT.conquistas.map(c=>`
-          <div class="ach ${c.got?'':'locked'}">
-            <div class="medal" style="background:${c.color}1a">${c.ic}</div>
-            <div class="grow"><div class="b9">${c.name}</div><div class="small muted">${c.desc}</div></div>
-            <div style="font-size:20px">${c.got?'✅':'🔒'}</div>
-          </div>`).join('')}
+        ${STUDENT.conquistas.map(c=>`<div class="ach ${c.got?'':'locked'}">
+          <div class="medal" style="background:${c.color}1a">${c.ic}</div>
+          <div class="grow"><div class="b9">${c.name}</div><div class="small muted">${c.desc}</div></div>
+          <div style="font-size:20px">${c.got?'✅':'🔒'}</div></div>`).join('')}
       </div>
     </div>
     <div class="empty-space"></div>
   </div>`;
 }
 
+// =========================================================================
+// LINK SCHOOL — aluno conecta à escola via código do professor
+// =========================================================================
+function LinkSchool(){
+  return `
+  <div>
+    <div class="topbar"><button class="icon-btn" data-act="link-cancel">←</button><div class="h3">Conectar à escola</div><div style="width:42px"></div></div>
+    <div class="section" style="padding-top:10px">
+      <div class="tcenter" style="padding:10px 0"><div style="font-size:60px">🏫</div></div>
+      <p class="muted b tcenter" style="max-width:320px;margin:0 auto">Sua escola parceira recebe um <b>código de turma</b> (ou login do professor). Digite abaixo para conectar.</p>
+
+      <div class="card pad mt16">
+        <div class="tiny faint b">Código da escola / turma</div>
+        <input class="onb-input" id="school-code" data-model="schoolCode" placeholder="Ex.: HORIZONTE-3A" style="text-transform:uppercase" />
+        <button class="btn btn-roxo btn-block mt12" data-act="link-submit">Conectar</button>
+        <p class="tiny faint b mt8">💡 No protótipo, experimente <b>HORIZONTE</b> (ou qualquer código).</p>
+      </div>
+
+      <div class="card pad mt12" style="background:var(--surface-2)">
+        <div class="b9 small">🔒 O que a escola vê — e o que não vê</div>
+        <div class="col gap6 mt8 small b">
+          <div class="row gap8"><span style="color:var(--verde-600)">✓</span> Seu desempenho, acertos e constância</div>
+          <div class="row gap8"><span style="color:var(--verde-600)">✓</span> Em quais temas você tem dificuldade</div>
+          <div class="row gap8"><span style="color:var(--vermelho-500)">✕</span> Não controla nem limita seu uso do app</div>
+          <div class="row gap8"><span style="color:var(--vermelho-500)">✕</span> Não vê conteúdo privado seu</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function submitLink(){
+  const code = (App.s.schoolCode || ($('#school-code') && $('#school-code').value) || '').trim();
+  if(!code){ toast('Digite o código da escola','warn','⚠️'); return; }
+  App.s.linkedSchool = /horizonte/i.test(code) ? 'Colégio Horizonte' : (code.split(/[-\s]/)[0][0].toUpperCase()+code.split(/[-\s]/)[0].slice(1).toLowerCase());
+  if(!/horizonte/i.test(code)) App.s.linkedSchool = 'Escola '+App.s.linkedSchool;
+  toast('Conectado a '+App.s.linkedSchool+'! 🎉','success','🏫');
+  confetti({count:110, y:innerHeight*0.4});
+  go('profile');
+}
+
 /* =========================================================================
-   FLIPEI — Portal da ESCOLA (B2B, profissional)
-   A escola monitora performance — sem controle sobre o uso do aluno.
+   FLIPEI — Portal da ESCOLA (B2B). Só leitura sobre o aluno + criar flashcards.
    ========================================================================= */
 
 function SchoolPortal(){
@@ -1552,6 +1586,7 @@ function SchoolPortal(){
     { id:'turmas',    ic:'👥', t:'Turmas' },
     { id:'alunos',    ic:'🎓', t:'Alunos' },
     { id:'dificuldades', ic:'🧩', t:'Dificuldades' },
+    { id:'flashcards', ic:'📇', t:'Flashcards' },
     { id:'atividades', ic:'📌', t:'Atividades' },
   ];
   let body = '';
@@ -1559,30 +1594,27 @@ function SchoolPortal(){
   else if(page==='turmas') body = SchoolTurmas();
   else if(page==='alunos') body = App.s.detailStudent ? SchoolStudentDetail() : SchoolAlunos();
   else if(page==='dificuldades') body = SchoolDificuldades();
+  else if(page==='flashcards') body = SchoolFlashcards();
   else if(page==='atividades') body = SchoolAtividades();
 
   return `
   <div class="portal">
     <aside class="side">
-      ${Logo(22)}
+      <div style="padding:0 6px">${LogoLight(22)}</div>
       <nav class="nav">
-        ${nav.map(n=>`<a class="${page===n.id?'on':''}" data-page="${n.id}"><span class="ic">${n.ic}</span><span class="t">${n.t}</span></a>`).join('')}
+        ${nav.map(n=>`<a class="${page===n.id?'on':''}" data-act="school-page" data-page="${n.id}"><span class="ic">${n.ic}</span><span class="t">${n.t}</span></a>`).join('')}
       </nav>
       <div class="school-chip">
         <div class="avatar" style="background:var(--roxo-500);width:38px;height:38px;font-size:15px">H</div>
         <div class="col"><span class="b9 small" style="color:#fff">${SCHOOL.name}</span><span class="tiny" style="color:#B8AFD6">${SCHOOL.plan}</span></div>
       </div>
     </aside>
-
     <main class="portal-main">
       <header class="portal-top">
-        <div class="row gap10">
-          <span class="h3">${nav.find(n=>n.id===page).t}</span>
-          <span class="pill gray small">Semana de 09–15 jun</span>
-        </div>
+        <div class="row gap10"><span class="h3">${nav.find(n=>n.id===page).t}</span><span class="pill gray small">Semana de 09–15 jun</span></div>
         <div class="row gap12">
           <span class="pill outline small">🔒 Somente leitura — a escola não interfere no app do aluno</span>
-          <div class="avatar" style="width:36px;height:36px;font-size:14px;background:var(--roxo-600)">${SCHOOL.admin[6]||'H'}</div>
+          <div class="avatar" style="width:36px;height:36px;font-size:14px;background:var(--roxo-600)">H</div>
         </div>
       </header>
       <div class="portal-body scroll"><div class="maxw fade-in">${body}</div></div>
@@ -1590,30 +1622,20 @@ function SchoolPortal(){
   </div>`;
 }
 
-function bindSchool(){
-  $('[data-page]').forEach(a=> a.addEventListener('click', ()=>{ App.s.schoolPage=a.dataset.page; App.s.detailStudent=null; render(); }));
-  $('[data-student]').forEach(r=> r.addEventListener('click', ()=>{ App.s.detailStudent=r.dataset.student; App.s.schoolPage='alunos'; render(); }));
-  $('[data-back-alunos]').forEach(b=> b.addEventListener('click', ()=>{ App.s.detailStudent=null; render(); }));
-}
+function LogoLight(size){ return `<span class="logo-word light" style="font-size:${size||22}px">flipei</span>`; }
 
 // ---- helpers ----
 function kpiCard(label, val, delta, up, color){
   return `<div class="pcard">
     <div class="row between"><div class="k">${label}</div>${delta?`<span class="delta ${up?'up':'down'}">${up?'▲':'▼'} ${delta}</span>`:''}</div>
-    <div class="v" style="${color?`color:${color}`:''}">${val}</div>
-  </div>`;
+    <div class="v" style="${color?`color:${color}`:''}">${val}</div></div>`;
 }
-function heatColor(acc){
-  if(acc>=80) return '#22C55E'; if(acc>=70) return '#84CC16'; if(acc>=60) return '#FACC15'; if(acc>=50) return '#FB923C'; return '#EF4444';
-}
+function heatColor(acc){ if(acc>=80) return '#22C55E'; if(acc>=70) return '#84CC16'; if(acc>=60) return '#FACC15'; if(acc>=50) return '#FB923C'; return '#EF4444'; }
 function statusDot(s){ return `<span class="dot ${s}"></span>`; }
 
 // =========================================================================
-// DASHBOARD
-// =========================================================================
 function SchoolDashboard(){
   const k = SCHOOL.kpis;
-  const eng = SCHOOL.engajamento14.map((v,i)=>v);
   const matData = SCHOOL.acuraciaMateria.map(m=>({ l:SUBJECTS[m.s].name, v:m.acc, color:heatColor(m.acc) }));
   return `
     <div class="grid-kpi">
@@ -1622,17 +1644,15 @@ function SchoolDashboard(){
       ${kpiCard('Acurácia média', k.acuracia.v, k.acuracia.delta, k.acuracia.up, 'var(--laranja-600)')}
       ${kpiCard('Cards revisados', k.cards.v, k.cards.delta, k.cards.up, 'var(--azul-500)')}
     </div>
-
     <div class="grid-2" style="margin-top:16px">
       <div class="pcard">
         <div class="row between"><div class="b9">Engajamento diário (14 dias)</div><span class="pill green small">↑ +12% vs. período anterior</span></div>
         <p class="tiny faint b">Alunos que estudaram pelo menos 1 sessão por dia.</p>
-        <div class="mt8">${lineChart(eng, { color:'#7C3AED', cssH:200 })}</div>
+        <div class="mt8">${lineChart(SCHOOL.engajamento14,{color:'#7C3AED',cssH:200})}</div>
       </div>
       <div class="pcard">
-        <div class="b9">Distribuição de constância</div>
-        <p class="tiny faint b">% dos alunos por faixa de streak.</p>
-        <div class="row center mt8">${ring(72, { size:150, color:'#7C3AED', label:'72%', sub:'com streak ativo' })}</div>
+        <div class="b9">Distribuição de constância</div><p class="tiny faint b">% dos alunos por faixa de streak.</p>
+        <div class="row center mt8">${ring(72,{size:150,color:'#7C3AED',label:'72%',sub:'com streak ativo'})}</div>
         <div class="col gap6 mt8">
           <div class="row between small b"><span>🔥 7+ dias</span><span>38%</span></div>
           <div class="row between small b"><span>📚 1–6 dias</span><span>34%</span></div>
@@ -1640,59 +1660,43 @@ function SchoolDashboard(){
         </div>
       </div>
     </div>
-
     <div class="grid-2" style="margin-top:16px">
       <div class="pcard">
-        <div class="b9">Acurácia média por matéria</div>
-        <p class="tiny faint b">Onde a escola vai bem — e onde precisa de reforço.</p>
-        <div class="mt8">${hBars(matData, {})}</div>
+        <div class="b9">Acurácia média por matéria</div><p class="tiny faint b">Onde a escola vai bem — e onde precisa de reforço.</p>
+        <div class="mt8">${hBars(matData,{})}</div>
       </div>
       <div class="pcard">
-        <div class="row between"><div class="b9">⚠️ Precisa de atenção</div><a class="link small" data-page="alunos">ver alunos</a></div>
+        <div class="row between"><div class="b9">⚠️ Precisa de atenção</div><a class="link small" data-act="school-page" data-page="alunos">ver alunos</a></div>
         <p class="tiny faint b">Queda de engajamento ou desempenho.</p>
         <div class="col gap8 mt8">
           ${SCHOOL.alunos.filter(a=>a.status!=='g').slice(0,4).map(a=>`
-            <div class="row gap10" style="padding:9px;border:1px solid #F1F3F9;border-radius:12px;cursor:pointer" data-student="${a.name}">
+            <div class="row gap10" style="padding:9px;border:1px solid #F1F3F9;border-radius:12px;cursor:pointer" data-act="open-student" data-student="${a.name}">
               <div class="avatar" style="width:34px;height:34px;font-size:13px;background:#94A3B8">${a.name[0]}</div>
               <div class="grow"><div class="b small">${a.name}</div><div class="tiny faint b">${a.turma} · streak ${a.streak} dias</div></div>
-              <span class="heat" style="background:${heatColor(a.acc)}1a;color:${heatColor(a.acc)}">${a.acc}%</span>
-            </div>`).join('')}
+              <span class="heat" style="background:${heatColor(a.acc)}1a;color:${heatColor(a.acc)}">${a.acc}%</span></div>`).join('')}
         </div>
         <div class="insight mt12"><span class="small b">💡 7 alunos não estudam há 3+ dias. Considere uma atividade em sala usando a Flipei.</span></div>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-// =========================================================================
-// TURMAS
-// =========================================================================
 function SchoolTurmas(){
   return `
     <div class="grid-kpi">
-      ${SCHOOL.turmas.map(t=>`
-        <div class="pcard" style="cursor:pointer" data-page="alunos">
-          <div class="b9" style="font-size:17px">${t.name}</div>
-          <div class="row between mt8"><span class="k">Ativos</span><span class="b">${t.ativos}/${t.alunos}</span></div>
-          <div class="bar thin mt4"><span style="width:${t.ativos/t.alunos*100}%"></span></div>
-          <div class="row gap16 mt12">
-            <div><div class="tiny faint b">Acurácia</div><div class="b9" style="color:${heatColor(t.acc)}">${t.acc}%</div></div>
-            <div><div class="tiny faint b">Engajamento</div><div class="b9" style="color:var(--roxo-600)">${t.eng}%</div></div>
-          </div>
-        </div>`).join('')}
+      ${SCHOOL.turmas.map(t=>`<div class="pcard" style="cursor:pointer" data-act="school-page" data-page="alunos">
+        <div class="b9" style="font-size:17px">${t.name}</div>
+        <div class="row between mt8"><span class="k">Ativos</span><span class="b">${t.ativos}/${t.alunos}</span></div>
+        <div class="bar thin mt4"><span style="width:${t.ativos/t.alunos*100}%"></span></div>
+        <div class="row gap16 mt12">
+          <div><div class="tiny faint b">Acurácia</div><div class="b9" style="color:${heatColor(t.acc)}">${t.acc}%</div></div>
+          <div><div class="tiny faint b">Engajamento</div><div class="b9" style="color:var(--roxo-600)">${t.eng}%</div></div></div></div>`).join('')}
     </div>
-
     <div class="pcard" style="margin-top:16px">
-      <div class="b9">Comparativo entre turmas</div>
-      <p class="tiny faint b">Acurácia média por turma.</p>
+      <div class="b9">Comparativo entre turmas</div><p class="tiny faint b">Acurácia média por turma.</p>
       <div class="mt8">${barChart(SCHOOL.turmas.map(t=>({l:t.name.replace('º Ano',''),v:t.acc,color:heatColor(t.acc)})),{h:200,values:true})}</div>
-    </div>
-  `;
+    </div>`;
 }
 
-// =========================================================================
-// ALUNOS (lista) + detalhe
-// =========================================================================
 function SchoolAlunos(){
   return `
     <div class="pcard">
@@ -1702,29 +1706,24 @@ function SchoolAlunos(){
           <span class="pill gray small">${SCHOOL.alunos.length} alunos</span>
         </div>
         <div class="legend">
-          <span><i style="background:var(--verde-500)"></i>Em dia</span>
-          <span><i style="background:var(--amarelo-400)"></i>Atenção</span>
-          <span><i style="background:var(--vermelho-500)"></i>Em risco</span>
+          <span><i style="background:var(--verde-500)"></i>Em dia</span><span><i style="background:var(--amarelo-400)"></i>Atenção</span><span><i style="background:var(--vermelho-500)"></i>Em risco</span>
         </div>
       </div>
       <table class="tbl mt12">
         <thead><tr><th>Aluno</th><th>Turma</th><th>Acurácia</th><th>Streak</th><th>Tempo/sem</th><th>Foco fraco</th><th>Status</th></tr></thead>
         <tbody>
-          ${SCHOOL.alunos.map(a=>`
-            <tr data-student="${a.name}">
-              <td><div class="row gap10"><div class="avatar" style="width:32px;height:32px;font-size:13px;background:${a.status==='g'?'var(--roxo-500)':a.status==='y'?'var(--laranja-500)':'#94A3B8'}">${a.name[0]}</div><span class="b">${a.name}</span></div></td>
-              <td class="muted b">${a.turma}</td>
-              <td><span class="heat" style="background:${heatColor(a.acc)}1a;color:${heatColor(a.acc)}">${a.acc}%</span></td>
-              <td class="b">🔥 ${a.streak}</td>
-              <td class="muted b">${Math.round(a.min/60*10)/10}h</td>
-              <td class="muted b">${a.foco}</td>
-              <td>${statusDot(a.status)} <span class="small b muted">${a.status==='g'?'Em dia':a.status==='y'?'Atenção':'Em risco'}</span></td>
-            </tr>`).join('')}
+          ${SCHOOL.alunos.map(a=>`<tr data-act="open-student" data-student="${a.name}">
+            <td><div class="row gap10"><div class="avatar" style="width:32px;height:32px;font-size:13px;background:${a.status==='g'?'var(--roxo-500)':a.status==='y'?'var(--laranja-500)':'#94A3B8'}">${a.name[0]}</div><span class="b">${a.name}</span></div></td>
+            <td class="muted b">${a.turma}</td>
+            <td><span class="heat" style="background:${heatColor(a.acc)}1a;color:${heatColor(a.acc)}">${a.acc}%</span></td>
+            <td class="b">🔥 ${a.streak}</td>
+            <td class="muted b">${Math.round(a.min/60*10)/10}h</td>
+            <td class="muted b">${a.foco}</td>
+            <td>${statusDot(a.status)} <span class="small b muted">${a.status==='g'?'Em dia':a.status==='y'?'Atenção':'Em risco'}</span></td></tr>`).join('')}
         </tbody>
       </table>
     </div>
-    <p class="tiny faint b mt12">🔒 A escola visualiza desempenho e constância. Não vê conteúdo privado nem interfere na experiência do aluno.</p>
-  `;
+    <p class="tiny faint b mt12">🔒 A escola visualiza desempenho e constância. Não vê conteúdo privado nem interfere na experiência do aluno.</p>`;
 }
 
 function SchoolStudentDetail(){
@@ -1732,125 +1731,159 @@ function SchoolStudentDetail(){
   const subj = STUDENT.bySubject.map(x=>({ l:SUBJECTS[x.s].name, v:x.acc, color:SUBJECTS[x.s].color }));
   const week = STUDENT.weeklyXp.map((v,i)=>({ l:['S','T','Q','Q','S','S','D'][i], v }));
   return `
-    <button class="btn btn-outline btn-sm" data-back-alunos>← Voltar para alunos</button>
+    <button class="btn btn-outline btn-sm" data-act="back-students">← Voltar para alunos</button>
     <div class="pcard" style="margin-top:14px">
       <div class="row between">
-        <div class="row gap12">
-          <div class="avatar" style="width:54px;height:54px;font-size:22px;background:var(--roxo-600)">${a.name[0]}</div>
-          <div><div class="h3">${a.name}</div><div class="muted b small">${a.turma} · ${SCHOOL.name}</div></div>
-        </div>
-        <div class="row gap10">
-          <span class="tag-stat tag-streak">🔥 ${a.streak} dias</span>
-          <span class="heat" style="background:${heatColor(a.acc)}1a;color:${heatColor(a.acc)};font-size:14px;padding:8px 12px">${a.acc}% acerto</span>
-        </div>
+        <div class="row gap12"><div class="avatar" style="width:54px;height:54px;font-size:22px;background:var(--roxo-600)">${a.name[0]}</div>
+          <div><div class="h3">${a.name}</div><div class="muted b small">${a.turma} · ${SCHOOL.name}</div></div></div>
+        <div class="row gap10"><span class="tag-stat tag-streak">🔥 ${a.streak} dias</span>
+          <span class="heat" style="background:${heatColor(a.acc)}1a;color:${heatColor(a.acc)};font-size:14px;padding:8px 12px">${a.acc}% acerto</span></div>
       </div>
     </div>
-
     <div class="grid-kpi" style="margin-top:16px">
       ${kpiCard('Tempo na semana', Math.round(a.min/60*10)/10+'h', null, true, 'var(--roxo-700)')}
       ${kpiCard('Cards na semana', (a.min*3), null, true, 'var(--azul-500)')}
       ${kpiCard('Maior dificuldade', a.foco, null, true, 'var(--vermelho-500)')}
       ${kpiCard('Status', a.status==='g'?'Em dia':a.status==='y'?'Atenção':'Em risco', null, true, heatColor(a.acc))}
     </div>
-
     <div class="grid-2" style="margin-top:16px">
-      <div class="pcard">
-        <div class="b9">Atividade de XP (semana)</div>
-        ${barChart(week,{h:200,values:true})}
-      </div>
-      <div class="pcard">
-        <div class="b9">Acerto por matéria</div>
-        <div class="mt8">${hBars(subj,{})}</div>
-      </div>
+      <div class="pcard"><div class="b9">Atividade de XP (semana)</div>${barChart(week,{h:200,values:true})}</div>
+      <div class="pcard"><div class="b9">Acerto por matéria</div><div class="mt8">${hBars(subj,{})}</div></div>
     </div>
-
     <div class="pcard" style="margin-top:16px">
       <div class="insight"><span class="small b">💡 ${a.name} tem ótima constância, mas ${a.foco!=='—'?a.foco+' está abaixo da média da turma':'desempenho equilibrado'}. Sugestão: indicar um bloco de revisão focado.</span></div>
-    </div>
-  `;
+    </div>`;
 }
 
-// =========================================================================
-// DIFICULDADES (agregado da escola)
-// =========================================================================
 function SchoolDificuldades(){
   return `
     <p class="muted b">Temas em que a escola mais erra — base para planejar aulas e atividades.</p>
     <div class="grid-2b" style="margin-top:14px">
-      ${SCHOOL.dificuldades.map(d=>`
-        <div class="pcard">
-          <div class="row between">
-            <div><span class="pill gray small">${d.mat}</span><div class="h3 mt8">${d.tema}</div></div>
-            <div class="tcenter">${ring(d.acc,{size:96,stroke:11,color:heatColor(d.acc),label:d.acc+'%'})}</div>
-          </div>
-          <div class="row between mt12">
-            <span class="small muted b">${d.alunos} alunos com dificuldade</span>
-            <button class="btn btn-ghost btn-sm" data-page="atividades">Criar atividade</button>
-          </div>
-        </div>`).join('')}
+      ${SCHOOL.dificuldades.map(d=>`<div class="pcard">
+        <div class="row between"><div><span class="pill gray small">${d.mat}</span><div class="h3 mt8">${d.tema}</div></div>
+          <div class="tcenter">${ring(d.acc,{size:96,stroke:11,color:heatColor(d.acc),label:d.acc+'%'})}</div></div>
+        <div class="row between mt12"><span class="small muted b">${d.alunos} alunos com dificuldade</span>
+          <button class="btn btn-ghost btn-sm" data-act="school-page" data-page="atividades">Criar atividade</button></div></div>`).join('')}
     </div>
-
     <div class="pcard" style="margin-top:16px">
-      <div class="insight"><span class="small b">💡 A IA da Flipei cruza o desempenho da turma com a incidência desses temas nas provas. <b>Funções exponenciais</b> caem muito no ENEM e tem só 48% de acerto — prioridade máxima.</span></div>
-    </div>
-  `;
+      <div class="insight"><span class="small b">💡 A IA da Flipei cruza o desempenho da turma com a incidência dos temas nas provas. <b>Funções exponenciais</b> caem muito no ENEM e tem só 48% de acerto — prioridade máxima.</span></div>
+    </div>`;
 }
 
 // =========================================================================
-// ATIVIDADES (escola propõe usando o app)
+// FLASHCARDS DA ESCOLA — a escola cria seus próprios decks
 // =========================================================================
+function SchoolFlashcards(){
+  const d = App.s.deckDraft;
+  return `
+    <p class="muted b">Além dos milhares de cards que a Flipei gera por prova (ENEM e vestibulares), a escola pode criar seus <b>próprios flashcards</b> — do jeito que ensina em sala.</p>
+
+    <div class="grid-2" style="margin-top:14px">
+      <div class="pcard">
+        <div class="b9">Criar um deck da escola</div>
+        <div class="col gap10 mt12">
+          <div><div class="tiny faint b">Título do deck</div>
+            <input class="onb-input" data-model="deckTitle" value="${esc(d.title)}" placeholder="Ex.: Revisão de Citologia — Profa. Helena"/></div>
+          <div class="row gap10">
+            <div class="grow"><div class="tiny faint b">Matéria</div>
+              <select id="deck-subj" class="onb-input" data-model="deckSubj">
+                ${Object.values(SUBJECTS).map(s=>`<option value="${s.id}" ${d.subj===s.id?'selected':''}>${s.emoji} ${s.name}</option>`).join('')}
+              </select></div>
+            <div class="grow"><div class="tiny faint b">Turmas</div><input class="onb-input" value="3º Ano A, B" placeholder="Turmas"/></div>
+          </div>
+          <div class="divider mt4"></div>
+          <div class="b9 small">Adicionar card</div>
+          <div><div class="tiny faint b">Frente (pergunta)</div><input class="onb-input" id="card-front" placeholder="Ex.: O que é a membrana plasmática?"/></div>
+          <div><div class="tiny faint b">Verso (resposta)</div><input class="onb-input" id="card-back" placeholder="Ex.: Camada que envolve a célula e controla o que entra/sai."/></div>
+          <button class="btn btn-outline btn-block btn-sm" data-act="deck-add-card">＋ Adicionar card ao deck</button>
+          <button class="btn btn-roxo btn-block" data-act="deck-publish">📇 Publicar deck para os alunos</button>
+          <p class="tiny faint b">Os cards da escola entram na experiência gamificada do aluno (XP, streak), junto com os da Flipei.</p>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="row between"><div class="b9">Cards no deck atual</div><span class="pill gray small">${d.cards.length} card(s)</span></div>
+        <div class="col gap8 mt12">
+          ${d.cards.length ? d.cards.map((c,i)=>`
+            <div style="border:1px solid #F1F3F9;border-radius:12px;padding:11px">
+              <div class="tiny faint b">Frente</div><div class="b small">${esc(c.q)}</div>
+              <div class="tiny faint b mt4">Verso</div><div class="small muted">${esc(c.a)}</div></div>`).join('')
+            : `<div class="tcenter" style="padding:24px 10px;color:#9690A8"><div style="font-size:38px">📇</div><div class="b small mt8">Nenhum card ainda</div><div class="tiny">Adicione cards ao lado para montar o deck.</div></div>`}
+        </div>
+      </div>
+    </div>
+
+    <div class="pcard" style="margin-top:16px">
+      <div class="b9">Decks publicados pela escola</div>
+      <table class="tbl mt8">
+        <thead><tr><th>Deck</th><th>Matéria</th><th>Cards</th><th>Turmas</th><th>Estudos</th></tr></thead>
+        <tbody>
+          ${[
+            { t:'Mapa da Guerra Fria', m:'História', c:42, tu:'3º A,B,C', e:'1.2k' },
+            { t:'Fórmulas de Geometria', m:'Matemática', c:30, tu:'3º A', e:'860' },
+            { t:'Reações orgânicas', m:'Química', c:55, tu:'3º B', e:'540' },
+          ].map(r=>`<tr><td class="b">${r.t}</td><td class="muted b">${r.m}</td><td>${r.c}</td><td class="muted b">${r.tu}</td><td class="b" style="color:var(--verde-600)">${r.e}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function schoolAddCard(){
+  const f = $('#card-front'), b = $('#card-back');
+  const q = f && f.value.trim(), a = b && b.value.trim();
+  if(!q || !a){ toast('Preencha frente e verso do card','warn','⚠️'); return; }
+  App.s.deckDraft.cards.push({ q, a });
+  toast('Card adicionado ao deck','success','＋');
+  render();
+}
+function schoolPublishDeck(){
+  const d = App.s.deckDraft;
+  d.title = App.s.deckTitle || d.title;
+  d.subj = App.s.deckSubj || d.subj;
+  if(!d.cards.length){ toast('Adicione ao menos 1 card antes de publicar','warn','⚠️'); return; }
+  toast(`Deck "${d.title||'Sem título'}" publicado para os alunos! 🎉`,'success','📇');
+  confetti({count:110, y:innerHeight*0.3});
+  App.s.deckDraft = { title:'', subj:'bio', cards:[] };
+  App.s.deckTitle=''; App.s.deckSubj='bio';
+  render();
+}
+
 function SchoolAtividades(){
   return `
     <p class="muted b">A escola pode propor atividades usando a Flipei — e acompanhar a adesão dos alunos.</p>
-
     <div class="grid-2" style="margin-top:14px">
       <div class="pcard">
         <div class="b9">Nova atividade</div>
         <div class="col gap10 mt12">
-          <div><div class="tiny faint b">Título</div><input value="Revisão: Funções exponenciais" style="border:1px solid #E7E9F2;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700;width:100%;margin-top:4px"/></div>
+          <div><div class="tiny faint b">Título</div><input class="onb-input" value="Revisão: Funções exponenciais"/></div>
           <div class="row gap10">
-            <div class="grow"><div class="tiny faint b">Turma</div><input value="3º Ano A, B e C" style="border:1px solid #E7E9F2;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700;width:100%;margin-top:4px"/></div>
-            <div class="grow"><div class="tiny faint b">Prazo</div><input value="20 jun" style="border:1px solid #E7E9F2;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700;width:100%;margin-top:4px"/></div>
-          </div>
-          <div><div class="tiny faint b">Meta</div>
-            <div class="row gap8 mt4"><span class="pill">30 flashcards</span><span class="pill outline">15 min</span><span class="pill outline">+ personalizar</span></div>
-          </div>
-          <button class="btn btn-roxo btn-block" id="create-act">📌 Publicar atividade para os alunos</button>
+            <div class="grow"><div class="tiny faint b">Turma</div><input class="onb-input" value="3º Ano A, B e C"/></div>
+            <div class="grow"><div class="tiny faint b">Prazo</div><input class="onb-input" value="20 jun"/></div></div>
+          <div><div class="tiny faint b">Meta</div><div class="row gap8 mt4"><span class="pill">30 flashcards</span><span class="pill outline">15 min</span><span class="pill outline">+ personalizar</span></div></div>
+          <button class="btn btn-roxo btn-block">📌 Publicar atividade para os alunos</button>
           <p class="tiny faint b">Os alunos recebem como um desafio gamificado no app — sem perder a experiência divertida.</p>
         </div>
       </div>
-
       <div class="pcard">
         <div class="b9">Atividades em andamento</div>
         <div class="col gap10 mt12">
-          ${[
-            { t:'Revisão: Estequiometria', turma:'3º Ano B', ad:78, prazo:'em 2 dias' },
-            { t:'Maratona de Biologia', turma:'2º Ano A', ad:92, prazo:'hoje' },
-            { t:'Simulado ENEM — Humanas', turma:'Todas', ad:54, prazo:'em 5 dias' },
-          ].map(x=>`
+          ${[{ t:'Revisão: Estequiometria', turma:'3º Ano B', ad:78, prazo:'em 2 dias' },{ t:'Maratona de Biologia', turma:'2º Ano A', ad:92, prazo:'hoje' },{ t:'Simulado ENEM — Humanas', turma:'Todas', ad:54, prazo:'em 5 dias' }].map(x=>`
             <div style="border:1px solid #F1F3F9;border-radius:14px;padding:12px">
               <div class="row between"><span class="b">${x.t}</span><span class="pill gray small">${x.prazo}</span></div>
               <div class="tiny faint b">${x.turma}</div>
               <div class="row between mt8"><span class="tiny b muted">Adesão</span><span class="tiny b" style="color:var(--verde-600)">${x.ad}%</span></div>
-              <div class="bar thin mt4"><span style="width:${x.ad}%"></span></div>
-            </div>`).join('')}
+              <div class="bar thin mt4"><span style="width:${x.ad}%"></span></div></div>`).join('')}
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 /* =========================================================================
    FLIPEI — Bootstrap
    ========================================================================= */
 (function init(){
-  // keep FX canvas sized
-  window.addEventListener('resize', ()=>{
-    const c = document.getElementById('fx-canvas');
-    if(c){ c.width = innerWidth; c.height = innerHeight; }
-  });
-  // initial route
   App.role = 'aluno';
+  App.device = 'mobile';
   App.route = 'splash';
   render();
 })();

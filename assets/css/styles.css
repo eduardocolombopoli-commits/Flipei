@@ -54,6 +54,7 @@
   --r-lg: 26px;
   --r-xl: 34px;
 
+  --grad-brand: linear-gradient(120deg, #7C3AED 0%, #A21CAF 50%, #DB2777 100%);
   --grad-roxo: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
   --grad-verde: linear-gradient(135deg, #4ADE80 0%, #16A34A 100%);
   --grad-streak: linear-gradient(135deg, #FDBA74 0%, #F97316 100%);
@@ -226,18 +227,24 @@ img { max-width:100%; display:block; }
 .tab.active .ic{ transform:translateY(-1px) scale(1.12); }
 
 /* =========================================================================
-   Logo mark
+   Logo — wordmark "flipei" minúsculo com gradiente roxo→magenta
    ========================================================================= */
-.logo{ display:inline-flex; align-items:center; gap:10px; }
-.logo .mark{
-  width:44px; height:44px; border-radius:13px; background:var(--grad-roxo);
-  display:grid; place-items:center; color:#fff; font-family:'Baloo 2'; font-weight:800; font-size:24px;
-  box-shadow:0 6px 14px rgba(124,58,237,.4); transform:rotate(-6deg);
-  position:relative;
+.logo-word{
+  font-family:'Baloo 2','Nunito',sans-serif; font-weight:800; letter-spacing:-1px; line-height:1;
+  background:var(--grad-brand); -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent; display:inline-block;
 }
-.logo .mark::after{ content:""; position:absolute; right:-3px; bottom:-3px; width:14px; height:14px; border-radius:5px; background:var(--verde-500); border:2px solid #fff; }
-.logo .word{ font-family:'Baloo 2'; font-weight:800; font-size:27px; color:var(--ink); letter-spacing:-.3px; }
-.logo .word b{ color:var(--roxo-600); }
+.logo-word.light{ background:linear-gradient(120deg,#C4B5FD,#F0ABFC,#F9A8D4); -webkit-background-clip:text; background-clip:text; }
+.logo-hero{ display:flex; align-items:center; justify-content:center; }
+.logo-hero .logo-word{ filter:drop-shadow(0 8px 16px rgba(168,28,175,.25)); }
+
+/* splash flip illustration (CSS puro) */
+.flip-illo{ position:relative; width:120px; height:130px; margin-bottom:4px; }
+.flip-illo .fi-card{ position:absolute; width:92px; height:120px; border-radius:18px; box-shadow:var(--sh-lg); }
+.flip-illo .fi-back{ left:8px; top:6px; background:linear-gradient(160deg,#EDE9FE,#FBCFE8); transform:rotate(-12deg); }
+.flip-illo .fi-front{ right:0; top:0; background:var(--grad-brand); transform:rotate(8deg); display:grid; place-items:center; animation:bob 2.4s ease-in-out infinite; }
+.flip-illo .fi-front span{ font-family:'Baloo 2'; font-weight:800; font-size:46px; color:#fff; }
+.splash-hero{ gap:14px; }
 
 /* =========================================================================
    Onboarding / Role select
@@ -420,11 +427,49 @@ table.tbl tr:hover td{ background:#FAFBFE; cursor:pointer; }
 /* Insight / suggestion box */
 .insight{ border-left:4px solid var(--roxo-500); background:var(--roxo-50); border-radius:0 14px 14px 0; padding:14px 16px; }
 
-/* role-switch floating */
-.role-switch{ position:fixed; right:14px; bottom:14px; z-index:8000; display:flex; gap:8px; background:#fff; padding:7px; border-radius:16px; box-shadow:var(--sh-lg); border:1px solid var(--line); }
-.role-switch button{ padding:8px 12px; border-radius:11px; font-weight:900; font-size:12px; color:var(--ink-soft); }
-.role-switch button.on{ background:var(--roxo-600); color:#fff; }
-@media (max-width:520px){ .role-switch{ bottom:auto; top:8px; right:8px; transform:scale(.9); } }
+/* floating view controls (demo): modo Aluno/Escola + Celular/Computador */
+.view-controls{ position:fixed; right:14px; bottom:14px; z-index:8000; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+.vc-group{ display:flex; align-items:center; gap:6px; background:#fff; padding:6px; border-radius:14px; box-shadow:var(--sh-lg); border:1px solid var(--line); }
+.vc-group .vc-lbl{ font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-faint); padding-left:6px; }
+.vc-group button{ padding:7px 11px; border-radius:10px; font-weight:900; font-size:12px; color:var(--ink-soft); white-space:nowrap; }
+.vc-group button.on{ background:var(--roxo-600); color:#fff; }
+@media (max-width:560px){ .view-controls{ bottom:auto; top:8px; right:8px; transform:scale(.88); transform-origin:top right; } }
+
+/* text inputs (onboarding / forms) */
+.onb-input{ width:100%; border:2px solid var(--line-strong); border-radius:14px; padding:13px 15px; font-family:inherit; font-weight:700; font-size:15px; color:var(--ink); margin-top:4px; background:#fff; transition:border-color .15s; }
+.onb-input:focus{ outline:none; border-color:var(--roxo-500); }
+.onb-input::placeholder{ color:var(--ink-faint); font-weight:600; }
+select.onb-input{ appearance:none; cursor:pointer; }
+.onb-input-wrap{ margin-top:14px; }
+
+/* =========================================================================
+   DESKTOP web shell (app do aluno em "Computador")
+   ========================================================================= */
+.webcard{ width:min(460px,94vw); max-height:94vh; background:var(--surface); border-radius:28px; box-shadow:var(--sh-lg); overflow:hidden; display:flex; flex-direction:column; border:1px solid var(--line); }
+.webcard .onb{ height:auto; }
+
+.webwrap{ display:flex; height:100%; width:100%; background:var(--bg); }
+.webside{
+  width:248px; flex:none; background:#fff; border-right:1px solid var(--line);
+  display:flex; flex-direction:column; padding:18px 12px; gap:4px;
+}
+.webnavlist{ display:flex; flex-direction:column; gap:4px; margin-top:6px; padding:0 4px; }
+.webnav{ display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; font-weight:800; font-size:15px; color:var(--ink-soft); }
+.webnav .ic{ font-size:20px; }
+.webnav:hover{ background:var(--roxo-50); color:var(--roxo-700); }
+.webnav.on{ background:var(--roxo-50); color:var(--roxo-700); box-shadow:inset 0 0 0 2px var(--roxo-300); }
+.webuser{ margin-top:auto; display:flex; gap:10px; align-items:center; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:1px solid var(--line); }
+.webmain{ flex:1; min-width:0; display:flex; justify-content:center; }
+.webcol{ width:100%; max-width:560px; padding:18px 0 60px; }
+.webcol .topbar{ padding-top:8px; }
+
+@media (max-width:900px){
+  .webside{ width:72px; padding:14px 8px; }
+  .webside .logo-word, .webnav span:not(.ic), .webuser .col, .webside .btn span, .webside .btn{ }
+  .webside > div:first-child{ display:flex; justify-content:center; }
+  .webnav{ justify-content:center; } .webnav span:not(.ic){ display:none; }
+  .webuser .col{ display:none; }
+}
 
 /* school responsive: collapse sidebar */
 @media (max-width:860px){
