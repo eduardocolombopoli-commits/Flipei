@@ -43,11 +43,12 @@
   --surface: #FFFFFF;
   --surface-2: #FBFAFE;
 
-  /* Sombras */
-  --sh-sm: 0 1px 2px rgba(31,18,53,.06), 0 1px 3px rgba(31,18,53,.05);
-  --sh-md: 0 6px 18px rgba(31,18,53,.08);
-  --sh-lg: 0 16px 40px rgba(31,18,53,.14);
+  /* Sombras (suaves, em camadas, com leve tinta roxa — feel premium 2026) */
+  --sh-sm: 0 1px 2px rgba(76,29,149,.05), 0 2px 6px rgba(76,29,149,.05);
+  --sh-md: 0 4px 10px rgba(76,29,149,.06), 0 12px 24px rgba(76,29,149,.07);
+  --sh-lg: 0 10px 24px rgba(76,29,149,.10), 0 28px 56px rgba(76,29,149,.14);
   --sh-pop: 0 10px 0 rgba(0,0,0,.10); /* botões 3D */
+  --ring: 0 0 0 3px rgba(124,58,237,.30); /* foco acessível */
 
   --r-sm: 12px;
   --r-md: 18px;
@@ -66,14 +67,17 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 html, body { height:100%; }
 body {
-  font-family:'Nunito', system-ui, sans-serif;
+  font-family:'Plus Jakarta Sans','Nunito', system-ui, sans-serif;
   background: var(--bg);
   color: var(--ink);
   font-size:16px;
-  line-height:1.45;
+  line-height:1.5;
+  letter-spacing:-0.01em;
   overflow:hidden;
   position:fixed;
   inset:0;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
 h1,h2,h3,h4,.display { font-family:'Baloo 2', 'Nunito', sans-serif; line-height:1.15; }
 button { font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
@@ -658,3 +662,83 @@ a.link{ color:var(--roxo-600); font-weight:800; cursor:pointer; }
 /* segmented control mais sóbrio */
 .seg{ background:#F2F0F7; }
 .seg button{ font-size:13px; }
+
+/* =========================================================================
+   REDESIGN 2026 — refino premium (tipografia, ícones, foco, profundidade)
+   Mantém paleta e essência; eleva o acabamento.
+   ========================================================================= */
+
+/* tipografia mais forte e escaneável */
+.h1{ font-weight:800; letter-spacing:-.02em; }
+.h2{ font-weight:800; letter-spacing:-.02em; }
+.h3{ font-weight:800; letter-spacing:-.015em; }
+.b9{ font-weight:800; }
+.b{ font-weight:700; }
+.muted{ color:var(--ink-soft); }
+
+/* ícones de linha */
+.ic-svg{ display:inline-block; vertical-align:middle; flex:none; }
+
+/* foco acessível (teclado) */
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, .tab:focus-visible, .choice:focus-visible{
+  outline:none; box-shadow:var(--ring); border-radius:12px;
+}
+
+/* ---- Tab bar (mobile) repaginada com ícones de linha ---- */
+.tabbar{ padding:10px 8px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid var(--line); background:rgba(255,255,255,.92); backdrop-filter:saturate(1.2) blur(8px); }
+.tab{ gap:4px; color:var(--ink-faint); border-radius:14px; padding:6px 2px; transition:color .15s, transform .12s; }
+.tab .ic{ display:grid; place-items:center; height:26px; }
+.tab .ic svg{ width:24px; height:24px; stroke-width:2; transition:transform .15s; }
+.tab span:last-child{ font-size:10.5px; font-weight:700; letter-spacing:-.01em; }
+.tab.active{ color:var(--roxo-600); background:transparent; }
+.tab.active .ic svg{ transform:translateY(-1px) scale(1.06); stroke-width:2.4; }
+.tab.active span:last-child{ font-weight:800; }
+.tab:not(.active):active{ transform:scale(.94); }
+
+/* ---- Web nav (desktop aluno) ---- */
+.webnav .ic{ display:grid; place-items:center; }
+.webnav .ic svg{ width:22px; height:22px; }
+.webnav.on .ic svg{ stroke-width:2.3; }
+
+/* ---- Sidebar escola: ícones de linha ---- */
+.side .nav a .ic{ display:grid; place-items:center; width:22px; }
+.side .nav a .ic svg{ width:19px; height:19px; }
+
+/* ---- profundidade / cards (soft, em camadas) ---- */
+.card{ box-shadow:var(--sh-sm); transition:box-shadow .18s ease, transform .18s ease; }
+@media (hover:hover){
+  .card:hover, .pcard:hover, .deck-row:hover{ box-shadow:var(--sh-md); }
+  .choice:hover{ border-color:var(--roxo-300); }
+}
+
+/* ---- pills / chips mais refinados ---- */
+.pill{ letter-spacing:-.01em; }
+
+/* ---- inputs ---- */
+.onb-input:focus, .pro-input:focus, .pro-select:focus{ box-shadow:var(--ring); }
+
+/* ---- skeleton de carregamento ---- */
+.skeleton{ position:relative; overflow:hidden; background:#ECEAF3; border-radius:12px; }
+.skeleton::after{ content:""; position:absolute; inset:0; transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent); animation:skel 1.3s infinite; }
+@keyframes skel{ to{ transform:translateX(100%); } }
+.skel-line{ height:12px; border-radius:7px; }
+.skel-card{ height:96px; border-radius:16px; }
+
+/* ---- estado vazio ---- */
+.empty-state{ text-align:center; padding:34px 18px; color:var(--ink-faint); }
+.empty-state .es-ic{ width:56px; height:56px; border-radius:18px; margin:0 auto 12px; display:grid; place-items:center; background:var(--roxo-50); color:var(--roxo-500); }
+.empty-state .es-t{ font-weight:800; color:var(--ink-soft); }
+.empty-state .es-s{ font-size:13px; font-weight:600; margin-top:3px; }
+
+/* ---- entrada suave de seções (stagger leve) ---- */
+.fade-in > .section{ animation:secIn .4s cubic-bezier(.2,.8,.2,1) both; }
+.fade-in > .section:nth-child(2){ animation-delay:.03s; }
+.fade-in > .section:nth-child(3){ animation-delay:.06s; }
+.fade-in > .section:nth-child(4){ animation-delay:.09s; }
+.fade-in > .section:nth-child(5){ animation-delay:.12s; }
+@keyframes secIn{ from{ opacity:0; transform:translateY(10px); } }
+@media (prefers-reduced-motion:reduce){ *{ animation:none !important; transition:none !important; } }
+
+/* botões: leve refino de foco/disabled e brilho no primário */
+.btn-roxo{ background-image:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0)); }

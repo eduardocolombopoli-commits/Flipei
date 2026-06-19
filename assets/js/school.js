@@ -6,14 +6,14 @@
 function SchoolPortal(){
   const page = App.s.schoolPage;
   const nav = [
-    { id:'dashboard',  ic:'▦', t:'Visão Geral' },
-    { id:'engajamento',ic:'📈', t:'Engajamento' },
-    { id:'desempenho', ic:'🎯', t:'Desempenho' },
-    { id:'turmas',     ic:'👥', t:'Turmas' },
-    { id:'alunos',     ic:'🎓', t:'Alunos' },
-    { id:'conteudo',   ic:'🧩', t:'Conteúdo' },
-    { id:'atividades', ic:'📌', t:'Atividades' },
-    { id:'insights',   ic:'💡', t:'Insights' },
+    { id:'dashboard',  ic:'grid', t:'Visão Geral' },
+    { id:'engajamento',ic:'trending', t:'Engajamento' },
+    { id:'desempenho', ic:'target', t:'Desempenho' },
+    { id:'turmas',     ic:'users', t:'Turmas' },
+    { id:'alunos',     ic:'cap', t:'Alunos' },
+    { id:'conteudo',   ic:'puzzle', t:'Conteúdo' },
+    { id:'atividades', ic:'clipboard', t:'Atividades' },
+    { id:'insights',   ic:'bulb', t:'Insights' },
   ];
   let body='';
   if(page==='dashboard') body=SchoolDashboard();
@@ -32,7 +32,7 @@ function SchoolPortal(){
       <div style="padding:0 6px 4px">${LogoLight(22)}</div>
       <div class="side-sub">Portal da Escola</div>
       <nav class="nav">
-        ${nav.map(n=>`<a class="${page===n.id?'on':''}" data-act="school-page" data-page="${n.id}"><span class="ic">${n.ic}</span><span class="t">${n.t}</span></a>`).join('')}
+        ${nav.map(n=>`<a class="${page===n.id?'on':''}" data-act="school-page" data-page="${n.id}"><span class="ic">${icon(n.ic,19)}</span><span class="t">${n.t}</span></a>`).join('')}
       </nav>
       <div class="school-chip">
         <div class="sc-logo">CH</div>

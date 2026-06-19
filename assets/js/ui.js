@@ -58,6 +58,38 @@ function $(sel, ctx){ return (ctx||document).querySelector(sel); }
 function $$(sel, ctx){ return Array.from((ctx||document).querySelectorAll(sel)); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
+// ---- sistema de ícones (linha, currentColor) ----
+const ICONS = {
+  home:'M3 10.5 12 3l9 7.5M5 9.5V20h5v-6h4v6h5V9.5',
+  layers:'M12 3 21 8l-9 5-9-5 9-5ZM3 13l9 5 9-5',
+  map:'M9 4 4 6v14l5-2 6 2 5-2V4l-5 2-6-2ZM9 4v14M15 6v14',
+  trophy:'M7 4h10v3a5 5 0 0 1-10 0V4ZM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 19h6M12 12v3',
+  gift:'M20 12v8H4v-8M2 8h20v4H2zM12 8v12M12 8S10.5 4 8.5 4.5 9 8 12 8ZM12 8s1.5-4 3.5-3.5S15 8 12 8Z',
+  chart:'M4 20V11M10 20V4M16 20v-6M4 20h16',
+  play:'M7 5l12 7-12 7z',
+  search:'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14ZM20 20l-3.6-3.6',
+  plus:'M12 5v14M5 12h14',
+  chevron:'M9 6l6 6-6 6',
+  sliders:'M4 21v-6M4 11V3M12 21v-9M12 7V3M20 21v-5M20 13V3M1 15h6M9 9h6M17 17h6',
+  lock:'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3',
+  check:'M5 12l5 5L20 7',
+  x:'M6 6l12 12M18 6 6 18',
+  bell:'M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M10.5 21a2 2 0 0 0 3 0',
+  grid:'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z',
+  trending:'M3 17l6-6 4 4 8-8M16 7h5v5',
+  target:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 12h.01',
+  users:'M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM21 21v-2a4 4 0 0 0-3-3.8M16 3.2a4 4 0 0 1 0 7.6',
+  cap:'M22 10 12 5 2 10l10 5 10-5ZM6 12v5c0 1.1 2.7 3 6 3s6-1.9 6-3v-5',
+  puzzle:'M10 4a2 2 0 0 1 4 0v1h4v4a2 2 0 0 0 0 4v4h-4a2 2 0 0 1-4 0H6v-4a2 2 0 0 0 0-4V5h4z',
+  clipboard:'M9 4h6v3H9zM7 5H5v15h14V5h-2M8 12h8M8 16h6',
+  bulb:'M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.5 10.9c.6.5.9 1.2 1 2.1h5c.1-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z',
+};
+function icon(name, size){
+  const p = ICONS[name]; if(!p) return '';
+  const s = size||24;
+  return `<svg class="ic-svg" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p.split('M').filter(Boolean).map(d=>`<path d="M${d}"/>`).join('')}</svg>`;
+}
+
 // ---- navigation ----
 function go(route, params){ App.route = route; App.params = params || {}; render(); }
 function setRole(role){
@@ -124,19 +156,19 @@ function DeviceWrap(inner, opts){
 }
 
 const NAV = [
-  { id:'home', ic:'🏠', label:'Início' },
-  { id:'decks', ic:'🗂️', label:'Decks' },
-  { id:'jornada', ic:'🗺️', label:'Jornada' },
-  { id:'ranking', ic:'🏆', label:'Ranking' },
-  { id:'premios', ic:'🎁', label:'Prêmios' },
-  { id:'profile', ic:'📊', label:'Perfil' },
+  { id:'home', ic:'home', label:'Início' },
+  { id:'decks', ic:'layers', label:'Decks' },
+  { id:'jornada', ic:'map', label:'Jornada' },
+  { id:'ranking', ic:'trophy', label:'Ranking' },
+  { id:'premios', ic:'gift', label:'Prêmios' },
+  { id:'profile', ic:'chart', label:'Perfil' },
 ];
 
 function PhoneShell(inner, opts){
   const tabbar = opts.tab ? `
     <div class="tabbar">
       ${NAV.map(t=>`<button class="tab ${t.id===opts.tab?'active':''}" data-act="go" data-route="${t.id}">
-        <span class="ic">${t.ic}</span><span>${t.label}</span></button>`).join('')}
+        <span class="ic">${icon(t.ic,24)}</span><span>${t.label}</span></button>`).join('')}
     </div>` : '';
   return `
   <div class="stage">
@@ -156,7 +188,7 @@ function DesktopShell(inner, opts){
     return `<div class="stage"><div class="webcard fade-in">${inner}</div></div>`;
   }
   const nav = `${NAV.map(t=>`<button class="webnav ${t.id===opts.tab?'on':''}" data-act="go" data-route="${t.id}">
-      <span class="ic">${t.ic}</span><span>${t.label}</span></button>`).join('')}`;
+      <span class="ic">${icon(t.ic,22)}</span><span>${t.label}</span></button>`).join('')}`;
   return `
   <div class="webwrap">
     <aside class="webside">
