@@ -498,6 +498,42 @@ select.onb-input{ appearance:none; cursor:pointer; }
 .slide-in{ animation:slideIn .3s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes slideIn{ from{ opacity:0; transform:translateX(24px);} }
 
+/* =========================================================================
+   DECKS (catálogo / meus decks)
+   ========================================================================= */
+.cat-mat{ border-top:1px solid var(--line); padding-top:12px; }
+.cat-sub{ padding-left:6px; }
+.deck-row{ display:flex; align-items:center; gap:10px; padding:10px 11px; border:1px solid var(--line); border-radius:13px; margin-bottom:6px; background:#fff; }
+
+/* =========================================================================
+   JORNADA — mapa de fases (gamificação)
+   ========================================================================= */
+.tier-badge{ width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:26px; flex:none; }
+
+.jornada-head{ color:#fff; padding:22px 18px; text-align:center; }
+.jornada-head .h2{ color:#fff; }
+
+.tier-track{ display:flex; align-items:flex-start; justify-content:space-between; gap:4px; }
+.tier-step{ flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; position:relative; }
+.tier-step::before{ content:""; position:absolute; top:19px; left:-50%; width:100%; height:3px; background:var(--line-strong); z-index:0; }
+.tier-step:first-child::before{ display:none; }
+.tier-step.past::before, .tier-step.now::before{ background:var(--roxo-400,#A78BFA); }
+.tier-dot{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-size:19px; background:var(--line); position:relative; z-index:1; box-shadow:0 2px 0 rgba(0,0,0,.08); }
+.tier-step.now .tier-dot{ transform:scale(1.18); box-shadow:0 0 0 4px var(--roxo-100); }
+
+/* winding path */
+.jpath{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:18px 0 6px; position:relative; }
+.jnode{ display:flex; flex-direction:column; align-items:center; position:relative; padding:6px 0; }
+.jbubble{ width:66px; height:66px; border-radius:50%; display:grid; place-items:center; font-family:'Baloo 2'; font-weight:800; font-size:26px; color:#fff; box-shadow:0 6px 0 rgba(0,0,0,.14); }
+.jlabel{ font-weight:800; font-size:12px; color:var(--ink-soft); margin-top:6px; text-align:center; max-width:150px; }
+.jnode.done .jbubble{ background:var(--grad-verde); box-shadow:0 6px 0 var(--verde-600); }
+.jnode.current .jbubble{ background:var(--grad-brand); box-shadow:0 6px 0 #5B21B6; animation:bob 1.8s ease-in-out infinite; transform:scale(1.12); }
+.jnode.next .jbubble{ background:var(--grad-xp); box-shadow:0 6px 0 #B45309; }
+.jnode.future .jbubble{ background:#D9D4E6; color:#fff; box-shadow:0 6px 0 #C3BCD6; }
+.jnode.chest .jbubble{ font-size:30px; }
+.jnode.tier .jbubble{ font-size:28px; }
+.jflag{ position:absolute; top:-26px; background:#fff; border:2px solid var(--roxo-300); color:var(--roxo-700); font-weight:900; font-size:11px; padding:4px 10px; border-radius:11px; box-shadow:var(--sh-md); white-space:nowrap; z-index:3; }
+
 /* misc */
 .divider{ height:1px; background:var(--line); }
 .hr-pad{ padding:0 18px; }
@@ -697,6 +733,116 @@ const SCHOOL = {
 };
 
 /* =========================================================================
+   DECKS — catálogo (Matéria → Submatéria → Deck). Personalização nova.
+   A aluna LIBERA decks; os liberados entram na revisão diária (espaçada).
+   ========================================================================= */
+const DECKS = [
+  // História
+  { id:'his-ri1', s:'his', sub:'Idade Contemporânea', name:'1ª Revolução Industrial', total:24, mastered:14, due:6,  unlocked:true },
+  { id:'his-gm2', s:'his', sub:'Idade Contemporânea', name:'2ª Guerra Mundial',        total:30, mastered:0,  due:0,  unlocked:false },
+  { id:'his-var', s:'his', sub:'Brasil República',    name:'Era Vargas',               total:20, mastered:8,  due:5,  unlocked:true },
+  { id:'his-dit', s:'his', sub:'Brasil República',    name:'Ditadura Militar',         total:22, mastered:0,  due:0,  unlocked:false },
+  // Biologia
+  { id:'bio-org', s:'bio', sub:'Citologia',           name:'Organelas Celulares',      total:28, mastered:20, due:4,  unlocked:true },
+  { id:'bio-mem', s:'bio', sub:'Citologia',           name:'Membrana Plasmática',      total:18, mastered:12, due:3,  unlocked:true },
+  { id:'bio-men', s:'bio', sub:'Genética',            name:'Leis de Mendel',           total:24, mastered:0,  due:0,  unlocked:false },
+  { id:'bio-dna', s:'bio', sub:'Genética',            name:'DNA e RNA',                total:20, mastered:0,  due:0,  unlocked:false },
+  // Matemática
+  { id:'mat-f1',  s:'mat', sub:'Funções',             name:'Função do 1º grau',        total:22, mastered:10, due:7,  unlocked:true },
+  { id:'mat-bha', s:'mat', sub:'Funções',             name:'Bhaskara / 2º grau',       total:26, mastered:0,  due:0,  unlocked:false },
+  { id:'mat-geo', s:'mat', sub:'Geometria',           name:'Áreas e Perímetros',       total:20, mastered:0,  due:0,  unlocked:false },
+  // Química
+  { id:'qui-est', s:'qui', sub:'Físico-Química',      name:'Estequiometria',           total:24, mastered:0,  due:0,  unlocked:false },
+  { id:'qui-org', s:'qui', sub:'Química Orgânica',    name:'Funções Orgânicas',        total:28, mastered:0,  due:0,  unlocked:false },
+  // Física
+  { id:'fis-new', s:'fis', sub:'Mecânica',            name:'Leis de Newton',           total:20, mastered:6,  due:8,  unlocked:true },
+  { id:'fis-ele', s:'fis', sub:'Eletricidade',        name:'Circuitos Elétricos',      total:22, mastered:0,  due:0,  unlocked:false },
+];
+
+// IA sugere decks para liberar (com base no objetivo + provas)
+const DECK_SUGGESTIONS = ['bio-men','mat-bha','qui-org'];
+
+/* =========================================================================
+   PESOS POR PROVA — incidência (edital + provas anteriores).
+   "Revisão rápida por prova" puxa do banco INTEIRO, ponderado por isso.
+   ========================================================================= */
+const EXAM_WEIGHTS = {
+  enem:    [
+    { l:'Interpretação de texto', s:'por', pct:12 },
+    { l:'Funções',                s:'mat', pct:10 },
+    { l:'Ecologia',               s:'bio', pct:9  },
+    { l:'Brasil República',       s:'his', pct:8  },
+    { l:'Físico-Química',         s:'qui', pct:7  },
+    { l:'Mecânica',               s:'fis', pct:7  },
+    { l:'Geografia Agrária',      s:'geo', pct:6  },
+  ],
+  ufrgs:   [
+    { l:'Interpretação de texto', s:'por', pct:12 },
+    { l:'Bhaskara / 2º grau',     s:'mat', pct:10 },
+    { l:'Mecânica',               s:'fis', pct:8  },
+    { l:'Química Orgânica',       s:'qui', pct:7  },
+    { l:'Genética',               s:'bio', pct:5  },
+    { l:'Egito Antigo',           s:'his', pct:5  },
+    { l:'Climatologia',           s:'geo', pct:5  },
+  ],
+  fuvest:  [
+    { l:'Interpretação / Literatura', s:'por', pct:14 },
+    { l:'Funções e Logaritmos',   s:'mat', pct:11 },
+    { l:'Eletromagnetismo',       s:'fis', pct:9  },
+    { l:'Estequiometria',         s:'qui', pct:8  },
+    { l:'Citologia',              s:'bio', pct:6  },
+    { l:'Brasil Colônia',         s:'his', pct:6  },
+  ],
+  unicamp: [
+    { l:'Interpretação de texto', s:'por', pct:13 },
+    { l:'Geometria',              s:'mat', pct:10 },
+    { l:'Termodinâmica',          s:'fis', pct:8  },
+    { l:'Físico-Química',         s:'qui', pct:7  },
+    { l:'Evolução',               s:'bio', pct:6  },
+    { l:'Geopolítica',            s:'geo', pct:6  },
+  ],
+};
+
+/* =========================================================================
+   JORNADA — progressão estilo "mapa de fases" (gamificação pura).
+   NÃO bloqueia conteúdo. Tiers + níveis + baús + conquistas.
+   ========================================================================= */
+const TIERS = [
+  { id:'bronze',   name:'Bronze',   icon:'🥉', color:'#B45309' },
+  { id:'prata',    name:'Prata',    icon:'🥈', color:'#64748B' },
+  { id:'ouro',     name:'Ouro',     icon:'🥇', color:'#EAB308' },
+  { id:'diamante', name:'Diamante', icon:'💎', color:'#06B6D4' },
+  { id:'lenda',    name:'Lenda',    icon:'👑', color:'#A855F7' },
+];
+
+// Estado de nível do aluno
+const LEVEL = { current:14, tier:'ouro', xpInLevel:250, xpForNext:400 };
+
+// Nós do mapa (do passado recente ao futuro). type: level|chest|badge|tier
+const JOURNEY = [
+  { lvl:10, type:'level', label:'Nível 10', state:'done' },
+  { lvl:11, type:'chest', label:'Baú: +50 💎', state:'done' },
+  { lvl:12, type:'level', label:'Nível 12', state:'done' },
+  { lvl:13, type:'badge', label:'🏅 Maratonista', state:'done' },
+  { lvl:14, type:'level', label:'Você está aqui', state:'current' },
+  { lvl:15, type:'chest', label:'Baú surpresa', state:'next' },
+  { lvl:16, type:'level', label:'Nível 16', state:'future' },
+  { lvl:17, type:'tier',  label:'Liga Diamante 💎', state:'future' },
+  { lvl:18, type:'level', label:'Nível 18', state:'future' },
+  { lvl:19, type:'chest', label:'Baú raro', state:'future' },
+  { lvl:20, type:'badge', label:'🏆 500 dominados', state:'future' },
+  { lvl:21, type:'level', label:'Nível 21', state:'future' },
+  { lvl:22, type:'tier',  label:'Rumo a Lenda 👑', state:'future' },
+];
+
+// Missões diárias (gamificação da Home)
+const DAILY_QUESTS = [
+  { ic:'🎯', t:'Estude 50 cards hoje',       cur:30, goal:50, reward:'+20 XP' },
+  { ic:'🔥', t:'Mantenha seu streak',        cur:1,  goal:1,  reward:'+10 XP', done:true },
+  { ic:'🎓', t:'Acerte 10 cards seguidos',   cur:6,  goal:10, reward:'+30 XP · 💎' },
+];
+
+/* =========================================================================
    FLIPEI — UI engine: router, event delegation, toasts, FX, charts
    ========================================================================= */
 
@@ -716,6 +862,11 @@ const App = {
     exam: 'enem',
     selectedSubjects: ['bio','mat','qui'],
     linkedSchool: null,          // escola vinculada pelo aluno
+    // decks / personalização nova
+    dailyGoalCards: 100,         // meta diária em cards
+    cardsToday: 0,
+    studySource: null,           // { mode:'daily'|'deck'|'exam', label, deckId? }
+    examReviewSel: 'enem',       // prova selecionada na revisão rápida (Perfil)
     // game
     deck: [],
     deckIndex: 0,
@@ -766,7 +917,7 @@ function render(){
   } else if(App.route === 'onboarding'){
     view = DeviceWrap(Onboarding(), { bare:true });
   } else {
-    const tab = ['home','ranking','personalize','profile'].includes(App.route) ? App.route : null;
+    const tab = ['home','decks','jornada','ranking','profile'].includes(App.route) ? App.route : null;
     const inner = ScreenFor(App.route);
     view = DeviceWrap(inner, { tab });
   }
@@ -779,10 +930,11 @@ function render(){
 function ScreenFor(route){
   switch(route){
     case 'home':         return Home();
+    case 'decks':        return Decks();
+    case 'jornada':      return Jornada();
     case 'game':         return Game();
     case 'complete':     return Complete();
     case 'ranking':      return Ranking();
-    case 'personalize':  return Personalize();
     case 'profile':      return Profile();
     case 'linkSchool':   return LinkSchool();
     default:             return Home();
@@ -809,8 +961,9 @@ function DeviceWrap(inner, opts){
 
 const NAV = [
   { id:'home', ic:'🏠', label:'Início' },
+  { id:'decks', ic:'🗂️', label:'Decks' },
+  { id:'jornada', ic:'🗺️', label:'Jornada' },
   { id:'ranking', ic:'🏆', label:'Ranking' },
-  { id:'personalize', ic:'🎯', label:'Personalizar' },
   { id:'profile', ic:'📊', label:'Perfil' },
 ];
 
@@ -844,7 +997,7 @@ function DesktopShell(inner, opts){
     <aside class="webside">
       <div style="padding:6px 10px 14px">${Logo(26)}</div>
       <nav class="webnavlist">${nav}</nav>
-      <button class="btn btn-roxo btn-block mt12" data-act="go" data-route="game" style="margin:0 8px">▶ Estudar</button>
+      <button class="btn btn-roxo btn-block mt12" data-act="start-daily" style="margin:0 8px">▶ Estudar</button>
       <div class="webuser">
         <div class="avatar" style="width:38px;height:38px;font-size:15px;background:var(--roxo-600)">${STUDENT.name[0]}</div>
         <div class="col"><span class="b9 small">${esc(STUDENT.name)}</span><span class="tiny faint">🔥 ${App.s.streak} · ${App.s.xp.toLocaleString('pt-BR')} XP</span></div>
@@ -927,14 +1080,15 @@ function handleAct(act, t, e){
     // ranking
     case 'rank-tab':  App.s.rankTab = d.tab; render(); break;
 
-    // personalize
-    case 'set-exam':  { App.s.exam=d.exam; const ex=EXAMS.find(x=>x.id===d.exam); App.s.goal=ex?ex.name:App.s.goal; toast('Foco atualizado: '+(ex?ex.name:''),'success','🎯'); render(); } break;
-    case 'toggle-subj': {
-      const id=d.subj, arr=App.s.selectedSubjects;
-      if(arr.includes(id)){ if(arr.length>1) App.s.selectedSubjects=arr.filter(x=>x!==id); else toast('Escolha ao menos 1 matéria','warn','⚠️'); }
-      else App.s.selectedSubjects=[...arr,id];
-      render(); break;
-    }
+    // decks / personalização
+    case 'unlock-deck': unlockDeck(d.deck); break;
+    case 'study-deck':  startStudy('deck', d.deck); break;
+    case 'start-daily': startStudy('daily'); break;
+    case 'set-goal':    App.s.dailyGoalCards = parseInt(d.goal,10); toast('Meta diária: '+d.goal+' cards','success','🎯'); render(); break;
+
+    // revisão por prova (Perfil)
+    case 'exam-pick':   App.s.examReviewSel = d.exam; render(); break;
+    case 'start-exam':  startStudy('exam', App.s.examReviewSel); break;
 
     // vincular escola
     case 'link-open':  go('linkSchool'); break;
@@ -1043,16 +1197,29 @@ function countUp(node, to, dur){
    FLIPEI — Telas do ALUNO
    ========================================================================= */
 
-// ---------- Logo (wordmark gradiente, minúsculo — vibe do Instagram) ----------
-function Logo(size){
-  size = size || 28;
-  return `<span class="logo-word" style="font-size:${size}px">flipei</span>`;
+// ---------- Logo ----------
+function Logo(size){ return `<span class="logo-word" style="font-size:${size||28}px">flipei</span>`; }
+function LogoBig(size){ return `<div class="logo-hero"><span class="logo-word" style="font-size:${size||64}px">flipei</span></div>`; }
+
+// ---------- helpers de decks ----------
+function unlockedDecks(){ return DECKS.filter(d=>d.unlocked); }
+function dueToday(){ return unlockedDecks().reduce((a,d)=>a+d.due,0); }
+function deckById(id){ return DECKS.find(d=>d.id===id); }
+
+function unlockDeck(id){
+  const d = deckById(id); if(!d) return;
+  d.unlocked = true; d.due = Math.max(d.due, Math.round(d.total*0.5));
+  toast(`Deck liberado: ${d.name} 🎉`,'success','🔓');
+  confetti({ count:90, y: innerHeight*0.4 });
+  render();
 }
-function LogoBig(size){
-  size = size || 64;
-  return `<div class="logo-hero">
-    <span class="logo-word" style="font-size:${size}px">flipei</span>
-  </div>`;
+
+function startStudy(mode, payload){
+  if(mode==='daily'){ App.s.studySource = { mode, label:'Revisão do dia' }; }
+  else if(mode==='deck'){ const d=deckById(payload); App.s.studySource = { mode, label:d?d.name:'Deck', deckId:payload, s:d?d.s:null }; }
+  else if(mode==='exam'){ const ex=EXAMS.find(e=>e.id===payload); App.s.studySource = { mode, label:'Simulado '+(ex?ex.name:''), exam:payload }; }
+  App.s.deck = [];
+  go('game');
 }
 
 // =========================================================================
@@ -1065,10 +1232,7 @@ function Splash(){
       <div class="blob" style="width:200px;height:200px;background:var(--roxo-300);top:2%;left:-40px;"></div>
       <div class="blob" style="width:150px;height:150px;background:#F9A8D4;bottom:20%;right:-30px;"></div>
       <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;">
-        <div class="flip-illo">
-          <div class="fi-card fi-back"></div>
-          <div class="fi-card fi-front"><span>?</span></div>
-        </div>
+        <div class="flip-illo"><div class="fi-card fi-back"></div><div class="fi-card fi-front"><span>?</span></div></div>
         ${LogoBig(58)}
         <div class="h2" style="margin-top:6px">Vira o card. Vira o jogo.</div>
         <p class="muted" style="max-width:300px;font-weight:700;">O app de flashcards pra quem vai passar no ENEM e no vestibular. Estudar com gamificação, IA e foco no que importa.</p>
@@ -1076,7 +1240,7 @@ function Splash(){
       <div style="display:flex;gap:22px;margin-top:8px;position:relative;z-index:2;">
         <div class="tcenter"><div class="h2">🔥</div><div class="tiny b muted">Streaks</div></div>
         <div class="tcenter"><div class="h2">🏆</div><div class="tiny b muted">Ligas</div></div>
-        <div class="tcenter"><div class="h2">🎯</div><div class="tiny b muted">No seu foco</div></div>
+        <div class="tcenter"><div class="h2">🗺️</div><div class="tiny b muted">Jornada</div></div>
       </div>
     </div>
     <div class="section">
@@ -1088,7 +1252,7 @@ function Splash(){
 }
 
 // =========================================================================
-// ONBOARDING — objetivo flexível (sem pressupor curso/universidade)
+// ONBOARDING
 // =========================================================================
 const GOAL_KINDS = [
   { id:'enem',     emoji:'📝', t:'Passar no ENEM', d:'Foco no Exame Nacional' },
@@ -1104,10 +1268,10 @@ const LEVELS = [
   { id:'3', emoji:'⚡', t:'Estudo sério', d:'Reta final, foco total' },
 ];
 const TIMES = [
-  { id:'5',  emoji:'☕', t:'5 min / dia',  d:'Casual' },
-  { id:'15', emoji:'🎯', t:'15 min / dia', d:'Regular (recomendado)' },
-  { id:'30', emoji:'🔥', t:'30 min / dia', d:'Sério' },
-  { id:'60', emoji:'🚀', t:'60 min / dia', d:'Intenso' },
+  { id:'50',  emoji:'☕', t:'50 cards / dia',  d:'Casual' },
+  { id:'100', emoji:'🎯', t:'100 cards / dia', d:'Regular (recomendado)' },
+  { id:'200', emoji:'🔥', t:'200 cards / dia', d:'Sério' },
+  { id:'300', emoji:'🚀', t:'300 cards / dia', d:'Intenso' },
 ];
 
 function onbCanContinue(){
@@ -1131,9 +1295,9 @@ function onbGoalLabel(){
 function onbNext(){
   if(!onbCanContinue()){ toast('Escolha uma opção pra continuar 🙂','warn','👆'); return; }
   if(App.s.onboardStep < 2){ App.s.onboardStep++; render(); return; }
-  // finalizar
   App.s.goal = onbGoalLabel();
-  if(App.s.onb_goalKind==='uni'){ const m=EXAMS.find(e=>String(App.s.onb_goalText).toLowerCase().includes(e.id)||String(App.s.onb_goalText).toUpperCase().includes(e.sigla)); if(m) App.s.exam=m.id; }
+  if(App.s.onb_time) App.s.dailyGoalCards = parseInt(App.s.onb_time,10);
+  if(App.s.onb_goalKind==='uni'){ const m=EXAMS.find(e=>String(App.s.onb_goalText).toLowerCase().includes(e.id)||String(App.s.onb_goalText).toUpperCase().includes(e.sigla)); if(m){ App.s.exam=m.id; App.s.examReviewSel=m.id; } }
   App.s.onboardStep = 0;
   toast('Perfil criado! Bem-vindo à Flipei 🎉','success','✨');
   confetti({count:130, y:innerHeight*0.4});
@@ -1145,29 +1309,20 @@ function Onboarding(){
   let title, sub, body;
   if(step===0){
     title='O que você quer conquistar?'; sub='Sem pressuposições — você escolhe (e pode digitar).';
-    const k = s.onb_goalKind;
-    let extra='';
+    const k = s.onb_goalKind; let extra='';
     if(k==='uni' || k==='curso'){
       const list = k==='uni'?UNI_SUGGEST:CURSO_SUGGEST;
       const ph = k==='uni'?'Digite a universidade (ex.: UFSC)':'Digite o curso (ex.: Veterinária)';
-      extra = `
-        <div class="onb-input-wrap slide-in">
+      extra = `<div class="onb-input-wrap slide-in">
           <div class="tiny faint b">${k==='uni'?'Qual universidade?':'Qual curso?'}</div>
           <input class="onb-input" data-model="onb_goalText" value="${esc(s.onb_goalText)}" placeholder="${ph}" />
-          <div class="row wrap gap8 mt8">
-            ${list.map(x=>`<button class="opt-chip ${s.onb_goalText===x?'on':''}" data-act="onb-suggest" data-val="${esc(x)}">${x}</button>`).join('')}
-          </div>
+          <div class="row wrap gap8 mt8">${list.map(x=>`<button class="opt-chip ${s.onb_goalText===x?'on':''}" data-act="onb-suggest" data-val="${esc(x)}">${x}</button>`).join('')}</div>
         </div>`;
     }
-    body = `
-      <div class="col gap10">
-        ${GOAL_KINDS.map(o=>`
-          <button class="choice ${k===o.id?'sel':''}" data-act="onb-pick" data-val="${o.id}">
-            <div class="emoji">${o.emoji}</div>
-            <div class="col"><div class="b9" style="font-size:16px">${o.t}</div><div class="small muted">${o.d}</div></div>
-            <div class="grow"></div><div style="font-size:20px;color:var(--roxo-500)">${k===o.id?'✓':''}</div>
-          </button>`).join('')}
-      </div>${extra}`;
+    body = `<div class="col gap10">${GOAL_KINDS.map(o=>`
+        <button class="choice ${k===o.id?'sel':''}" data-act="onb-pick" data-val="${o.id}">
+          <div class="emoji">${o.emoji}</div><div class="col"><div class="b9" style="font-size:16px">${o.t}</div><div class="small muted">${o.d}</div></div>
+          <div class="grow"></div><div style="font-size:20px;color:var(--roxo-500)">${k===o.id?'✓':''}</div></button>`).join('')}</div>${extra}`;
   } else if(step===1){
     title='Como está sua rotina hoje?'; sub='Sem julgamentos — só pra começar do jeito certo.';
     body = `<div class="col gap10">${LEVELS.map(o=>`
@@ -1188,24 +1343,21 @@ function Onboarding(){
       <div class="bar roxo thin grow" style="max-width:200px"><span style="width:${(step+1)/3*100}%"></span></div>
       <div style="width:42px"></div>
     </div>
-    <div style="padding:8px 22px 0;">
-      <div class="eyebrow">Passo ${step+1} de 3</div>
-      <div class="h2 mt4">${title}</div>
-      <p class="muted b mt4">${sub}</p>
-    </div>
+    <div style="padding:8px 22px 0;"><div class="eyebrow">Passo ${step+1} de 3</div><div class="h2 mt4">${title}</div><p class="muted b mt4">${sub}</p></div>
     <div class="scroll" style="flex:1;padding:18px 22px;">${body}</div>
-    <div class="section">
-      <button class="btn btn-roxo btn-block btn-lg" id="onb-next" data-act="onb-next" ${onbCanContinue()?'':'disabled'}>${step<2?'Continuar':'Criar meu perfil'}</button>
-    </div>
+    <div class="section"><button class="btn btn-roxo btn-block btn-lg" id="onb-next" data-act="onb-next" ${onbCanContinue()?'':'disabled'}>${step<2?'Continuar':'Criar meu perfil'}</button></div>
   </div>`;
 }
 
 // =========================================================================
-// HOME — trilha + status (sem vidas)
+// HOME — loop diário + missões + teaser da jornada
 // =========================================================================
 function Home(){
   const s = App.s;
-  const pct = Math.min(100, Math.round(s.xpToday / STUDENT.dailyGoal * 100));
+  const due = dueToday();
+  const pct = Math.min(100, Math.round(s.cardsToday / s.dailyGoalCards * 100));
+  const tier = TIERS.find(t=>t.id===LEVEL.tier);
+  const lvlPct = Math.round(LEVEL.xpInLevel/LEVEL.xpForNext*100);
   return `
   <div>
     <div class="topbar">
@@ -1217,13 +1369,14 @@ function Home(){
       </div>
     </div>
 
+    <!-- Meta diária -->
     <div class="section">
       <div class="card pad">
         <div class="row between">
-          <div><div class="eyebrow">Meta de hoje</div><div class="h3">${s.xpToday} / ${STUDENT.dailyGoal} XP</div></div>
+          <div><div class="eyebrow">Meta de hoje</div><div class="h3">${s.cardsToday} / ${s.dailyGoalCards} cards</div></div>
           <div class="pill ${pct>=100?'green':''}">${pct>=100?'Concluída! 🎉':pct+'%'}</div>
         </div>
-        <div class="bar xp mt12"><span style="width:${pct}%"></span></div>
+        <div class="bar mt12"><span style="width:${pct}%"></span></div>
         <div class="row between mt8">
           <span class="small muted b">Objetivo: <b style="color:var(--roxo-700)">${esc(s.goal)}</b></span>
           <span class="small b" style="color:var(--laranja-600)">🔥 ${s.streak} dias seguidos</span>
@@ -1231,35 +1384,53 @@ function Home(){
       </div>
     </div>
 
+    <!-- CTA principal: revisão do dia -->
     <div class="section">
-      <button class="btn btn-roxo btn-block btn-lg" data-act="go" data-route="game">▶  Estudar agora</button>
-      <div class="row gap10 mt12">
-        <button class="btn btn-outline grow btn-sm" data-act="go" data-route="game">⚡ Revisão rápida</button>
-        <button class="btn btn-outline grow btn-sm" data-act="go" data-route="personalize">🎯 Mudar foco</button>
+      <div class="card pad" style="background:var(--grad-brand);border:none;color:#fff">
+        <div class="row between">
+          <div><div class="tiny b" style="opacity:.9;text-transform:uppercase;letter-spacing:.5px">Revisão do dia</div>
+            <div class="h2" style="color:#fff">${due} cards te esperam</div>
+            <div class="small" style="opacity:.92;font-weight:700">Mix inteligente dos seus decks liberados</div></div>
+          <div style="font-size:40px">🎴</div>
+        </div>
+        <button class="btn btn-amarelo btn-block btn-lg mt12" data-act="start-daily">▶ Estudar agora</button>
+      </div>
+      <button class="btn btn-outline btn-block btn-sm mt12" data-act="go" data-route="decks">🗂️ Escolher um deck específico</button>
+    </div>
+
+    <!-- Missões diárias -->
+    <div class="section">
+      <div class="row between"><div class="b9">🎯 Missões de hoje</div><span class="pill orange small">Renova em 8h</span></div>
+      <div class="col gap8 mt8">
+        ${DAILY_QUESTS.map(q=>{ const p=Math.min(100,Math.round(q.cur/q.goal*100)); const done=q.done||q.cur>=q.goal;
+          return `<div class="card pad" style="padding:12px">
+            <div class="row gap10">
+              <div style="font-size:24px">${q.ic}</div>
+              <div class="grow"><div class="row between"><span class="b small">${q.t}</span><span class="pill ${done?'green':'gray'} small">${q.reward}</span></div>
+                <div class="bar thin mt4"><span style="width:${p}%"></span></div>
+                <div class="tiny faint b mt4">${done?'Concluída ✅':q.cur+' / '+q.goal}</div></div>
+            </div></div>`; }).join('')}
       </div>
     </div>
 
+    <!-- Teaser da Jornada -->
     <div class="section">
-      <div class="unit-banner">
-        <div class="col"><span class="tiny b" style="opacity:.85;text-transform:uppercase;letter-spacing:.5px">Sua trilha</span>
-          <span class="h3" style="color:#fff">${PATH.unit}</span></div>
-        <div style="font-size:34px">🧬</div>
-      </div>
-      <div class="path">
-        ${PATH.nodes.map((n,i)=>{ const off=[0,38,-30,30,-22,0][i]||0;
-          return `<div class="node ${n.state}" style="transform:translateX(${off}px)">
-            ${n.state==='current'?`<div class="start-here">COMECE AQUI</div>`:''}
-            ${n.state==='done'?`<div class="crown">👑</div>`:''}
-            <button class="bubble" ${n.state!=='locked'?'data-act="go" data-route="game"':''}>${n.ic}</button>
-            <div class="label">${n.label}</div></div>`; }).join('')}
+      <div class="card pad" style="cursor:pointer" data-act="go" data-route="jornada">
+        <div class="row gap12">
+          <div class="tier-badge" style="background:${tier.color}1a;color:${tier.color}">${tier.icon}</div>
+          <div class="grow"><div class="row between"><span class="b9">Nível ${LEVEL.current} · ${tier.name}</span><span class="link small">ver jornada →</span></div>
+            <div class="bar roxo thin mt8"><span style="width:${lvlPct}%"></span></div>
+            <div class="tiny faint b mt4">${LEVEL.xpForNext-LEVEL.xpInLevel} XP para o próximo nível 🎁</div></div>
+        </div>
       </div>
     </div>
 
+    <!-- Desafio social -->
     <div class="section">
       <div class="card pad" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA">
         <div class="row gap12"><div style="font-size:34px">⚔️</div>
           <div class="grow"><div class="b9">Desafio relâmpago</div><div class="small muted b">Ana te desafiou: 20 cards de Biologia. Faltam <b>4h</b>!</div></div>
-          <button class="btn btn-amarelo btn-sm" data-act="go" data-route="game">Aceitar</button></div>
+          <button class="btn btn-amarelo btn-sm" data-act="start-daily">Aceitar</button></div>
       </div>
     </div>
     <div class="empty-space"></div>
@@ -1267,11 +1438,160 @@ function Home(){
 }
 
 // =========================================================================
-// GAME — flashcards (sem vidas; erro só agenda revisão)
+// DECKS — catálogo + meus decks + revisão do dia (personalização nova)
+// =========================================================================
+function Decks(){
+  const s = App.s;
+  const mine = unlockedDecks();
+  const due = dueToday();
+  const goals = [50,100,200,300];
+  // catálogo agrupado por matéria → submatéria
+  const byMat = {};
+  DECKS.forEach(d=>{ (byMat[d.s]=byMat[d.s]||{}); (byMat[d.s][d.sub]=byMat[d.s][d.sub]||[]).push(d); });
+
+  return `
+  <div>
+    <div class="topbar"><div class="h3">🗂️ Decks</div></div>
+    <p class="hr-pad muted b small" style="margin-top:-4px">Libere os temas conforme estuda. Eles entram na sua revisão diária automaticamente.</p>
+
+    <!-- meta diária -->
+    <div class="section" style="padding-top:12px">
+      <div class="card pad">
+        <div class="row between"><span class="b9">Minha meta diária</span><span class="pill">${s.dailyGoalCards} cards/dia</span></div>
+        <div class="row wrap gap8 mt8">
+          ${goals.map(g=>`<button class="opt-chip ${s.dailyGoalCards===g?'on':''}" data-act="set-goal" data-goal="${g}">${g}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- revisão do dia -->
+    <div class="section">
+      <div class="card pad" style="background:var(--grad-brand);border:none;color:#fff">
+        <div class="row between"><div><div class="tiny b" style="opacity:.9;text-transform:uppercase">Revisão do dia</div>
+          <div class="h2" style="color:#fff">${due} cards</div></div><div style="font-size:36px">🎴</div></div>
+        <button class="btn btn-amarelo btn-block mt12" data-act="start-daily">Estudar revisão do dia</button>
+      </div>
+    </div>
+
+    <!-- sugestão IA -->
+    <div class="section">
+      <div class="ai-card"><div class="spark">✨</div>
+        <div class="pill" style="background:rgba(255,255,255,.18);color:#fff">🤖 Sugestão da IA</div>
+        <div class="b9 mt8" style="color:#fff;font-size:16px">Libere estes para o seu objetivo (${esc(s.goal)})</div>
+        <div class="col gap8 mt12">
+          ${DECK_SUGGESTIONS.map(id=>{ const d=deckById(id); if(!d||d.unlocked) return ''; const sj=SUBJECTS[d.s];
+            return `<div class="row gap10" style="background:rgba(255,255,255,.12);border-radius:12px;padding:9px 11px">
+              <span style="font-size:18px">${sj.emoji}</span>
+              <div class="grow"><div class="b small" style="color:#fff">${d.name}</div><div class="tiny" style="opacity:.8;color:#fff">${sj.name} · ${d.total} cards</div></div>
+              <button class="btn btn-amarelo btn-sm" data-act="unlock-deck" data-deck="${d.id}">Liberar</button></div>`; }).join('')||'<div class="small" style="opacity:.9;color:#fff">Tudo liberado! 🎉</div>'}
+        </div>
+      </div>
+    </div>
+
+    <!-- meus decks -->
+    <div class="section">
+      <div class="row between"><div class="b9">📚 Meus decks (${mine.length})</div></div>
+      <div class="col gap8 mt8">
+        ${mine.length ? mine.map(d=>{ const sj=SUBJECTS[d.s]; const p=Math.round(d.mastered/d.total*100);
+          return `<div class="card pad" style="padding:13px;cursor:pointer" data-act="study-deck" data-deck="${d.id}">
+            <div class="row gap10">
+              <div class="subj-ic" style="background:${sj.color}1a;color:${sj.color}">${sj.emoji}</div>
+              <div class="grow"><div class="row between"><span class="b small">${d.name}</span>${d.due?`<span class="pill orange small">${d.due} p/ revisar</span>`:`<span class="pill green small">em dia</span>`}</div>
+                <div class="tiny faint b">${sj.name} · ${d.sub}</div>
+                <div class="bar thin mt4"><span style="width:${p}%"></span></div>
+                <div class="tiny faint b mt4">${d.mastered}/${d.total} dominados</div></div>
+            </div></div>`; }).join('') : `<div class="card pad tcenter muted b small">Você ainda não liberou decks. Explore o catálogo abaixo 👇</div>`}
+      </div>
+    </div>
+
+    <!-- catálogo -->
+    <div class="section">
+      <div class="b9">🔎 Catálogo completo</div>
+      <p class="tiny faint b">Banco com milhares de flashcards de todos os conteúdos.</p>
+      ${Object.keys(byMat).map(sid=>{ const sj=SUBJECTS[sid];
+        return `<div class="cat-mat mt12">
+          <div class="row gap8" style="align-items:center"><div class="subj-ic" style="background:${sj.color}1a;color:${sj.color};width:32px;height:32px;font-size:17px">${sj.emoji}</div><span class="b9">${sj.name}</span></div>
+          ${Object.keys(byMat[sid]).map(sub=>`
+            <div class="cat-sub"><div class="tiny faint b" style="text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">${sub}</div>
+              ${byMat[sid][sub].map(d=>`
+                <div class="deck-row">
+                  <div class="grow"><div class="b small">${d.name}</div><div class="tiny faint b">${d.total} cards${d.unlocked?` · ${d.mastered} dominados`:''}</div></div>
+                  ${d.unlocked ? `<span class="pill green small">✓ Liberado</span>` : `<button class="btn btn-ghost btn-sm" data-act="unlock-deck" data-deck="${d.id}">＋ Liberar</button>`}
+                </div>`).join('')}
+            </div>`).join('')}
+        </div>`; }).join('')}
+    </div>
+    <div class="empty-space"></div>
+  </div>`;
+}
+
+// =========================================================================
+// JORNADA — mapa de níveis (Candy Crush / só gamificação)
+// =========================================================================
+function Jornada(){
+  const tier = TIERS.find(t=>t.id===LEVEL.tier);
+  const lvlPct = Math.round(LEVEL.xpInLevel/LEVEL.xpForNext*100);
+  const curTierIdx = TIERS.findIndex(t=>t.id===LEVEL.tier);
+  // ícone do nó por tipo
+  const nodeIcon = (n)=> n.type==='chest'?'🎁': n.type==='badge'?'🏅': n.type==='tier'?'👑': n.lvl;
+  return `
+  <div>
+    <!-- header de tier -->
+    <div class="jornada-head" style="background:linear-gradient(135deg,${tier.color},#4C1D95)">
+      <div style="font-size:50px">${tier.icon}</div>
+      <div class="h2" style="color:#fff">Liga ${tier.name} · Nível ${LEVEL.current}</div>
+      <div class="bar thin mt8" style="max-width:240px;margin:8px auto 0;background:rgba(255,255,255,.25)"><span style="width:${lvlPct}%;background:#fff"></span></div>
+      <p class="small mt8" style="opacity:.92;font-weight:800">${LEVEL.xpInLevel}/${LEVEL.xpForNext} XP · faltam ${LEVEL.xpForNext-LEVEL.xpInLevel} para subir</p>
+    </div>
+
+    <!-- trilha de tiers -->
+    <div class="section" style="padding-top:14px">
+      <div class="tier-track">
+        ${TIERS.map((t,i)=>`<div class="tier-step ${i<curTierIdx?'past':i===curTierIdx?'now':''}">
+          <div class="tier-dot" style="${i<=curTierIdx?`background:${t.color};color:#fff`:''}">${t.icon}</div>
+          <div class="tiny b ${i===curTierIdx?'':'faint'}">${t.name}</div></div>`).join('')}
+      </div>
+    </div>
+
+    <!-- mapa de fases -->
+    <div class="section">
+      <div class="card pad" style="background:linear-gradient(180deg,#FBFAFE,#F5F3FF);overflow:hidden">
+        <div class="b9 tcenter">🗺️ Sua jornada</div>
+        <p class="tiny faint b tcenter">Cada nível rende XP, baús e conquistas. Conteúdo é livre — aqui é só recompensa.</p>
+        <div class="jpath">
+          ${JOURNEY.slice().reverse().map((n,i)=>{ const off=[0,40,60,40,0,-40,-60,-40][i%8]||0;
+            return `<div class="jnode ${n.type} ${n.state}" style="transform:translateX(${off}px)">
+              ${n.state==='current'?`<div class="jflag">VOCÊ 🧍</div>`:''}
+              <div class="jbubble">${nodeIcon(n)}</div>
+              <div class="jlabel">${n.label}</div>
+            </div>`; }).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- próximas recompensas -->
+    <div class="section">
+      <div class="b9">🎁 Próximas recompensas</div>
+      <div class="col gap8 mt8">
+        <div class="ach"><div class="medal" style="background:#FACC151a">🎁</div><div class="grow"><div class="b9">Baú surpresa (Nível 15)</div><div class="small muted">Pode vir gems, avatar ou freeze de streak</div></div><span class="pill small">próximo</span></div>
+        <div class="ach"><div class="medal" style="background:#06B6D41a">💎</div><div class="grow"><div class="b9">Liga Diamante (Nível 17)</div><div class="small muted">Novo emblema + tema exclusivo</div></div></div>
+        <div class="ach"><div class="medal" style="background:#A855F71a">🏆</div><div class="grow"><div class="b9">500 cards dominados</div><div class="small muted">Conquista "Cérebro de Aço"</div></div></div>
+      </div>
+    </div>
+    <div class="empty-space"></div>
+  </div>`;
+}
+
+// =========================================================================
+// GAME
 // =========================================================================
 function startDeck(){
-  let pool = CARDS.filter(c=> App.s.selectedSubjects.includes(c.s));
-  if(pool.length < 6) pool = CARDS.slice();
+  const src = App.s.studySource || { mode:'daily' };
+  let pool;
+  if(src.mode==='deck' && src.s){ pool = CARDS.filter(c=>c.s===src.s); }
+  else if(src.mode==='daily'){ const subs=[...new Set(unlockedDecks().map(d=>d.s))]; pool = CARDS.filter(c=>subs.includes(c.s)); }
+  else { pool = CARDS.slice(); } // exam: banco inteiro (ponderado, conceitual)
+  if(pool.length < 5) pool = CARDS.slice();
   pool = pool.slice().sort(()=>Math.random()-0.5).slice(0,8);
   App.s.deck = pool.map(c=>({ ...c }));
   App.s.deckIndex=0; App.s.revealed=false; App.s.combo=0;
@@ -1280,35 +1600,30 @@ function startDeck(){
 
 function Game(){
   if(!App.s.deck.length) startDeck();
-  const idx = App.s.deckIndex;
-  const card = App.s.deck[idx];
-  const subj = SUBJECTS[card.s];
+  const idx = App.s.deckIndex, card = App.s.deck[idx], subj = SUBJECTS[card.s];
   const pct = Math.round(idx / App.s.deck.length * 100);
   const flipped = App.s.revealed;
+  const srcLabel = (App.s.studySource && App.s.studySource.label) || 'Estudando';
   return `
   <div class="game">
     <div class="game-top">
       <button class="icon-btn" data-act="quit" style="background:#F1EFF6;color:var(--ink-soft)">✕</button>
-      <div class="bar"><span style="width:${pct}%"></span></div>
+      <div class="grow"><div class="tiny faint b" style="text-align:center;margin-bottom:3px">${srcLabel}</div><div class="bar"><span style="width:${pct}%"></span></div></div>
       <span class="pill small">${idx+1}/${App.s.deck.length}</span>
     </div>
     ${App.s.combo>=2?`<div class="combo show">🔥 Combo x${App.s.combo}</div>`:''}
-
     <div class="card-area">
       <div class="flashcard ${flipped?'flipped':''}" ${flipped?'':'data-act="reveal"'}>
         <div class="face front">
           <span class="subject-tag pill" style="background:${subj.color}1a;color:${subj.color}">${subj.emoji} ${subj.name} · ${card.sub}</span>
-          <div class="q">${card.q}</div>
-          <div class="flip-hint">👆 Toque para ver a resposta</div>
+          <div class="q">${card.q}</div><div class="flip-hint">👆 Toque para ver a resposta</div>
         </div>
         <div class="face back">
-          <span class="a-label">Resposta</span>
-          <div class="q" style="font-size:19px;font-weight:700">${card.a}</div>
+          <span class="a-label">Resposta</span><div class="q" style="font-size:19px;font-weight:700">${card.a}</div>
           <div class="hint">Você acertou? Seja honesto — isso treina a IA 🧠</div>
         </div>
       </div>
     </div>
-
     ${flipped ? `
       <div class="rate-grid slide-in">
         <button class="rate err"  data-act="rate" data-rate="0"><span class="ic">😵</span>Errei<span class="when">rever já</span></button>
@@ -1322,20 +1637,16 @@ function Game(){
 
 function gameAnswer(rating, btn){
   const correct = rating >= 2;
-  App.s.sessionTotal++;
+  App.s.sessionTotal++; App.s.cardsToday++;
   if(correct){
     App.s.sessionCorrect++; App.s.combo++;
     const base = rating===3?12:10, bonus=Math.min(App.s.combo,5)*2, gain=base+bonus;
     App.s.sessionXp += gain; floatXp(gain, btn);
     if(App.s.combo>=3) toast(`Combo x${App.s.combo}! +${bonus} XP de bônus 🔥`,'warn','🔥');
-  } else {
-    App.s.combo=0; toast('Tranquilo — esse volta logo pra você revisar 💪','brand','📌');
-  }
+  } else { App.s.combo=0; toast('Tranquilo — esse volta logo pra você revisar 💪','brand','📌'); }
   App.s.deckIndex++; App.s.revealed=false;
-  if(App.s.deckIndex >= App.s.deck.length){
-    App.s.xp += App.s.sessionXp; App.s.xpToday += App.s.sessionXp;
-    go('complete');
-  } else render();
+  if(App.s.deckIndex >= App.s.deck.length){ App.s.xp += App.s.sessionXp; go('complete'); }
+  else render();
 }
 
 // =========================================================================
@@ -1344,6 +1655,7 @@ function gameAnswer(rating, btn){
 function Complete(){
   const acc = App.s.sessionTotal ? Math.round(App.s.sessionCorrect/App.s.sessionTotal*100) : 0;
   const perfect = acc===100;
+  const pct = Math.min(100, Math.round(App.s.cardsToday/App.s.dailyGoalCards*100));
   return `
   <div class="complete fade-in">
     <div class="trophy">${perfect?'🏆':'🎉'}</div>
@@ -1356,11 +1668,11 @@ function Complete(){
       <div class="stat-tile" style="background:var(--grad-brand)"><div class="v">${App.s.sessionTotal}</div><div class="k">📇 Cards revisados</div></div>
     </div>
     <div class="card pad mt20" style="width:100%">
-      <div class="row between"><span class="b">Meta diária</span><span class="b" style="color:var(--roxo-700)">${App.s.xpToday}/${STUDENT.dailyGoal} XP</span></div>
-      <div class="bar xp mt8"><span style="width:${Math.min(100,App.s.xpToday/STUDENT.dailyGoal*100)}%"></span></div>
+      <div class="row between"><span class="b">Meta diária</span><span class="b" style="color:var(--roxo-700)">${App.s.cardsToday}/${App.s.dailyGoalCards} cards</span></div>
+      <div class="bar mt8"><span style="width:${pct}%"></span></div>
     </div>
     <div style="width:100%;margin-top:20px;display:flex;flex-direction:column;gap:10px">
-      <button class="btn btn-verde btn-block btn-lg" data-act="go" data-route="game">Continuar estudando</button>
+      <button class="btn btn-verde btn-block btn-lg" data-act="start-daily">Continuar estudando</button>
       <button class="btn btn-ghost btn-block" data-act="go" data-route="home">Voltar ao início</button>
     </div>
   </div>`;
@@ -1402,69 +1714,21 @@ function Ranking(){
 }
 
 // =========================================================================
-// PERSONALIZE
-// =========================================================================
-function Personalize(){
-  const s = App.s;
-  return `
-  <div>
-    <div class="topbar"><div class="h3">🎯 Personalizar estudos</div></div>
-    <p class="hr-pad muted b small" style="margin-top:-4px">Você no controle: a Flipei entrega flashcards do que importa pra você.</p>
-    <div class="section" style="padding-top:14px">
-      <div class="ai-card"><div class="spark">✨</div>
-        <div class="pill" style="background:rgba(255,255,255,.18);color:#fff">🤖 Sugestão da IA</div>
-        <div class="h3 mt8" style="color:#fff">Foque em Física e Matemática</div>
-        <p class="small" style="opacity:.92;font-weight:700;margin-top:4px">Analisamos as últimas provas + seu desempenho. Esses temas caem muito e são onde você mais erra.</p>
-        <button class="btn btn-amarelo btn-sm mt12" data-act="go" data-route="game">Treinar pontos fracos</button>
-      </div>
-    </div>
-    <div class="section">
-      <div class="eyebrow">Sua prova / universidade</div>
-      <div class="col gap10 mt8">
-        ${EXAMS.map(e=>`<div class="uni-card ${s.exam===e.id?'on':''}" data-act="set-exam" data-exam="${e.id}">
-          <div class="uni-logo" style="background:${e.color}">${e.sigla}</div>
-          <div class="grow"><div class="b9">${e.name}</div><div class="small muted">${e.sub}</div></div>
-          <div style="font-size:20px;color:var(--roxo-500)">${s.exam===e.id?'✓':'○'}</div></div>`).join('')}
-      </div>
-    </div>
-    <div class="section">
-      <div class="eyebrow">Matérias no seu foco</div>
-      <p class="tiny faint b">Toque para ativar/desativar. Você recebe mais cards do que escolher.</p>
-      <div class="row wrap gap8 mt8">
-        ${Object.values(SUBJECTS).map(sub=>`<button class="opt-chip ${s.selectedSubjects.includes(sub.id)?'on':''}" data-act="toggle-subj" data-subj="${sub.id}">${sub.emoji} ${sub.name}</button>`).join('')}
-      </div>
-    </div>
-    <div class="section">
-      <div class="eyebrow">Aprofundar em um tema</div>
-      <div class="card pad mt8">
-        <div class="row between"><span class="b">Biologia</span><span class="link">trocar</span></div>
-        <div class="row wrap gap8 mt8">
-          <span class="pill">Citologia</span><span class="pill outline">Genética</span><span class="pill outline">Ecologia</span><span class="pill outline">Evolução</span><span class="pill outline">+ temas</span>
-        </div>
-        <button class="btn btn-outline btn-block btn-sm mt12" data-act="go" data-route="game">Estudar só "Citologia"</button>
-      </div>
-    </div>
-    <div class="empty-space"></div>
-  </div>`;
-}
-
-// =========================================================================
-// PROFILE — dashboard + vínculo com escola
+// PROFILE — dashboard + revisão por prova + vínculo escola
 // =========================================================================
 function Profile(){
   const s = App.s;
   const subjData = STUDENT.bySubject.map(x=>({ l:SUBJECTS[x.s].name, v:x.acc, color:SUBJECTS[x.s].color }));
   const weekData = STUDENT.weeklyXp.map((v,i)=>({ l:['S','T','Q','Q','S','S','D'][i], v }));
   const linked = s.linkedSchool;
+  const sel = s.examReviewSel;
+  const weights = EXAM_WEIGHTS[sel] || [];
   return `
   <div>
     <div style="background:var(--grad-brand);padding:22px 18px 26px;color:#fff;border-radius:0 0 26px 26px;">
       <div class="row between">
-        <div class="row gap12">
-          <div class="avatar" style="background:#fff;color:var(--roxo-700);width:56px;height:56px;font-size:24px">${STUDENT.name[0]}</div>
-          <div><div class="h3" style="color:#fff">${STUDENT.name}</div>
-            <div class="small" style="opacity:.9;font-weight:800">${STUDENT.handle}${linked?' · '+esc(linked):''}</div></div>
-        </div>
+        <div class="row gap12"><div class="avatar" style="background:#fff;color:var(--roxo-700);width:56px;height:56px;font-size:24px">${STUDENT.name[0]}</div>
+          <div><div class="h3" style="color:#fff">${STUDENT.name}</div><div class="small" style="opacity:.9;font-weight:800">${STUDENT.handle}${linked?' · '+esc(linked):''}</div></div></div>
         <button class="icon-btn" style="background:rgba(255,255,255,.18);color:#fff">⚙️</button>
       </div>
       <div class="row gap8 mt16">
@@ -1474,23 +1738,30 @@ function Profile(){
       </div>
     </div>
 
-    <!-- Vínculo com a escola -->
+    <!-- Revisão rápida por prova -->
     <div class="section" style="padding-top:16px">
+      <div class="card pad">
+        <div class="b9">⚡ Revisão rápida por prova</div>
+        <p class="tiny faint b">Puxa do banco inteiro, ponderado pela incidência de cada prova (edital + provas anteriores).</p>
+        <div class="row wrap gap8 mt8">
+          ${EXAMS.filter(e=>EXAM_WEIGHTS[e.id]).map(e=>`<button class="opt-chip ${sel===e.id?'on':''}" data-act="exam-pick" data-exam="${e.id}">${e.name}</button>`).join('')}
+        </div>
+        <div class="mt12">${hBars(weights.map(w=>({l:w.l, v:w.pct, color:SUBJECTS[w.s].color})), { labelW:150 })}</div>
+        <button class="btn btn-roxo btn-block mt8" data-act="start-exam">▶ Iniciar revisão ponderada</button>
+      </div>
+    </div>
+
+    <!-- Vínculo escola -->
+    <div class="section">
       ${linked ? `
         <div class="card pad" style="border-color:var(--verde-300);background:var(--verde-100)">
-          <div class="row gap12">
-            <div style="font-size:30px">🏫</div>
-            <div class="grow"><div class="b9">Conectado a ${esc(linked)}</div>
-              <div class="small muted b">Sua escola acompanha seu progresso. Ela vê desempenho — nunca interfere no seu app.</div></div>
-            <button class="btn btn-outline btn-sm" data-act="unlink">Desvincular</button>
-          </div>
+          <div class="row gap12"><div style="font-size:30px">🏫</div>
+            <div class="grow"><div class="b9">Conectado a ${esc(linked)}</div><div class="small muted b">Sua escola acompanha seu progresso. Ela vê desempenho — nunca interfere no seu app.</div></div>
+            <button class="btn btn-outline btn-sm" data-act="unlink">Desvincular</button></div>
         </div>` : `
         <div class="card pad" style="border:2px dashed var(--roxo-300);background:var(--roxo-50)">
-          <div class="row gap12">
-            <div style="font-size:30px">🏫</div>
-            <div class="grow"><div class="b9">Sua escola é parceira Flipei?</div>
-              <div class="small muted b">Peça o <b>código do professor</b> e conecte sua conta. Você continua usando o app livremente.</div></div>
-          </div>
+          <div class="row gap12"><div style="font-size:30px">🏫</div>
+            <div class="grow"><div class="b9">Sua escola é parceira Flipei?</div><div class="small muted b">Peça o <b>código do professor</b> e conecte sua conta. Você continua usando o app livremente.</div></div></div>
           <button class="btn btn-roxo btn-block btn-sm mt12" data-act="link-open">🔗 Conectar à minha escola</button>
         </div>`}
     </div>
@@ -1512,8 +1783,7 @@ function Profile(){
     <div class="section"><div class="card pad">
       <div class="b9">🎯 Acerto por matéria</div><p class="tiny faint b">Onde você brilha e onde precisa de reforço.</p>
       <div class="mt8">${hBars(subjData,{})}</div>
-      <div class="insight mt8" style="border-color:var(--laranja-500);background:var(--laranja-100)">
-        <span class="small b" style="color:var(--laranja-600)">💡 Física (59%) é seu ponto mais fraco. Que tal 10 cards agora?</span></div>
+      <div class="insight mt8" style="border-color:var(--laranja-500);background:var(--laranja-100)"><span class="small b" style="color:var(--laranja-600)">💡 Física (59%) é seu ponto mais fraco. Que tal liberar o deck "Leis de Newton"?</span></div>
     </div></div>
 
     <div class="section"><div class="card pad">
@@ -1524,10 +1794,8 @@ function Profile(){
     <div class="section">
       <div class="row between"><div class="b9">🏅 Conquistas</div><span class="link">ver todas</span></div>
       <div class="col gap8 mt8">
-        ${STUDENT.conquistas.map(c=>`<div class="ach ${c.got?'':'locked'}">
-          <div class="medal" style="background:${c.color}1a">${c.ic}</div>
-          <div class="grow"><div class="b9">${c.name}</div><div class="small muted">${c.desc}</div></div>
-          <div style="font-size:20px">${c.got?'✅':'🔒'}</div></div>`).join('')}
+        ${STUDENT.conquistas.map(c=>`<div class="ach ${c.got?'':'locked'}"><div class="medal" style="background:${c.color}1a">${c.ic}</div>
+          <div class="grow"><div class="b9">${c.name}</div><div class="small muted">${c.desc}</div></div><div style="font-size:20px">${c.got?'✅':'🔒'}</div></div>`).join('')}
       </div>
     </div>
     <div class="empty-space"></div>
@@ -1535,7 +1803,7 @@ function Profile(){
 }
 
 // =========================================================================
-// LINK SCHOOL — aluno conecta à escola via código do professor
+// LINK SCHOOL
 // =========================================================================
 function LinkSchool(){
   return `
@@ -1544,14 +1812,12 @@ function LinkSchool(){
     <div class="section" style="padding-top:10px">
       <div class="tcenter" style="padding:10px 0"><div style="font-size:60px">🏫</div></div>
       <p class="muted b tcenter" style="max-width:320px;margin:0 auto">Sua escola parceira recebe um <b>código de turma</b> (ou login do professor). Digite abaixo para conectar.</p>
-
       <div class="card pad mt16">
         <div class="tiny faint b">Código da escola / turma</div>
         <input class="onb-input" id="school-code" data-model="schoolCode" placeholder="Ex.: HORIZONTE-3A" style="text-transform:uppercase" />
         <button class="btn btn-roxo btn-block mt12" data-act="link-submit">Conectar</button>
         <p class="tiny faint b mt8">💡 No protótipo, experimente <b>HORIZONTE</b> (ou qualquer código).</p>
       </div>
-
       <div class="card pad mt12" style="background:var(--surface-2)">
         <div class="b9 small">🔒 O que a escola vê — e o que não vê</div>
         <div class="col gap6 mt8 small b">
@@ -1568,8 +1834,7 @@ function LinkSchool(){
 function submitLink(){
   const code = (App.s.schoolCode || ($('#school-code') && $('#school-code').value) || '').trim();
   if(!code){ toast('Digite o código da escola','warn','⚠️'); return; }
-  App.s.linkedSchool = /horizonte/i.test(code) ? 'Colégio Horizonte' : (code.split(/[-\s]/)[0][0].toUpperCase()+code.split(/[-\s]/)[0].slice(1).toLowerCase());
-  if(!/horizonte/i.test(code)) App.s.linkedSchool = 'Escola '+App.s.linkedSchool;
+  App.s.linkedSchool = /horizonte/i.test(code) ? 'Colégio Horizonte' : ('Escola '+code.split(/[-\s]/)[0][0].toUpperCase()+code.split(/[-\s]/)[0].slice(1).toLowerCase());
   toast('Conectado a '+App.s.linkedSchool+'! 🎉','success','🏫');
   confetti({count:110, y:innerHeight*0.4});
   go('profile');

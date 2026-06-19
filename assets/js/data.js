@@ -172,3 +172,113 @@ const SCHOOL = {
     { tema:'Genética / Mendel',    mat:'Biologia',   acc:61, alunos:88 },
   ],
 };
+
+/* =========================================================================
+   DECKS — catálogo (Matéria → Submatéria → Deck). Personalização nova.
+   A aluna LIBERA decks; os liberados entram na revisão diária (espaçada).
+   ========================================================================= */
+const DECKS = [
+  // História
+  { id:'his-ri1', s:'his', sub:'Idade Contemporânea', name:'1ª Revolução Industrial', total:24, mastered:14, due:6,  unlocked:true },
+  { id:'his-gm2', s:'his', sub:'Idade Contemporânea', name:'2ª Guerra Mundial',        total:30, mastered:0,  due:0,  unlocked:false },
+  { id:'his-var', s:'his', sub:'Brasil República',    name:'Era Vargas',               total:20, mastered:8,  due:5,  unlocked:true },
+  { id:'his-dit', s:'his', sub:'Brasil República',    name:'Ditadura Militar',         total:22, mastered:0,  due:0,  unlocked:false },
+  // Biologia
+  { id:'bio-org', s:'bio', sub:'Citologia',           name:'Organelas Celulares',      total:28, mastered:20, due:4,  unlocked:true },
+  { id:'bio-mem', s:'bio', sub:'Citologia',           name:'Membrana Plasmática',      total:18, mastered:12, due:3,  unlocked:true },
+  { id:'bio-men', s:'bio', sub:'Genética',            name:'Leis de Mendel',           total:24, mastered:0,  due:0,  unlocked:false },
+  { id:'bio-dna', s:'bio', sub:'Genética',            name:'DNA e RNA',                total:20, mastered:0,  due:0,  unlocked:false },
+  // Matemática
+  { id:'mat-f1',  s:'mat', sub:'Funções',             name:'Função do 1º grau',        total:22, mastered:10, due:7,  unlocked:true },
+  { id:'mat-bha', s:'mat', sub:'Funções',             name:'Bhaskara / 2º grau',       total:26, mastered:0,  due:0,  unlocked:false },
+  { id:'mat-geo', s:'mat', sub:'Geometria',           name:'Áreas e Perímetros',       total:20, mastered:0,  due:0,  unlocked:false },
+  // Química
+  { id:'qui-est', s:'qui', sub:'Físico-Química',      name:'Estequiometria',           total:24, mastered:0,  due:0,  unlocked:false },
+  { id:'qui-org', s:'qui', sub:'Química Orgânica',    name:'Funções Orgânicas',        total:28, mastered:0,  due:0,  unlocked:false },
+  // Física
+  { id:'fis-new', s:'fis', sub:'Mecânica',            name:'Leis de Newton',           total:20, mastered:6,  due:8,  unlocked:true },
+  { id:'fis-ele', s:'fis', sub:'Eletricidade',        name:'Circuitos Elétricos',      total:22, mastered:0,  due:0,  unlocked:false },
+];
+
+// IA sugere decks para liberar (com base no objetivo + provas)
+const DECK_SUGGESTIONS = ['bio-men','mat-bha','qui-org'];
+
+/* =========================================================================
+   PESOS POR PROVA — incidência (edital + provas anteriores).
+   "Revisão rápida por prova" puxa do banco INTEIRO, ponderado por isso.
+   ========================================================================= */
+const EXAM_WEIGHTS = {
+  enem:    [
+    { l:'Interpretação de texto', s:'por', pct:12 },
+    { l:'Funções',                s:'mat', pct:10 },
+    { l:'Ecologia',               s:'bio', pct:9  },
+    { l:'Brasil República',       s:'his', pct:8  },
+    { l:'Físico-Química',         s:'qui', pct:7  },
+    { l:'Mecânica',               s:'fis', pct:7  },
+    { l:'Geografia Agrária',      s:'geo', pct:6  },
+  ],
+  ufrgs:   [
+    { l:'Interpretação de texto', s:'por', pct:12 },
+    { l:'Bhaskara / 2º grau',     s:'mat', pct:10 },
+    { l:'Mecânica',               s:'fis', pct:8  },
+    { l:'Química Orgânica',       s:'qui', pct:7  },
+    { l:'Genética',               s:'bio', pct:5  },
+    { l:'Egito Antigo',           s:'his', pct:5  },
+    { l:'Climatologia',           s:'geo', pct:5  },
+  ],
+  fuvest:  [
+    { l:'Interpretação / Literatura', s:'por', pct:14 },
+    { l:'Funções e Logaritmos',   s:'mat', pct:11 },
+    { l:'Eletromagnetismo',       s:'fis', pct:9  },
+    { l:'Estequiometria',         s:'qui', pct:8  },
+    { l:'Citologia',              s:'bio', pct:6  },
+    { l:'Brasil Colônia',         s:'his', pct:6  },
+  ],
+  unicamp: [
+    { l:'Interpretação de texto', s:'por', pct:13 },
+    { l:'Geometria',              s:'mat', pct:10 },
+    { l:'Termodinâmica',          s:'fis', pct:8  },
+    { l:'Físico-Química',         s:'qui', pct:7  },
+    { l:'Evolução',               s:'bio', pct:6  },
+    { l:'Geopolítica',            s:'geo', pct:6  },
+  ],
+};
+
+/* =========================================================================
+   JORNADA — progressão estilo "mapa de fases" (gamificação pura).
+   NÃO bloqueia conteúdo. Tiers + níveis + baús + conquistas.
+   ========================================================================= */
+const TIERS = [
+  { id:'bronze',   name:'Bronze',   icon:'🥉', color:'#B45309' },
+  { id:'prata',    name:'Prata',    icon:'🥈', color:'#64748B' },
+  { id:'ouro',     name:'Ouro',     icon:'🥇', color:'#EAB308' },
+  { id:'diamante', name:'Diamante', icon:'💎', color:'#06B6D4' },
+  { id:'lenda',    name:'Lenda',    icon:'👑', color:'#A855F7' },
+];
+
+// Estado de nível do aluno
+const LEVEL = { current:14, tier:'ouro', xpInLevel:250, xpForNext:400 };
+
+// Nós do mapa (do passado recente ao futuro). type: level|chest|badge|tier
+const JOURNEY = [
+  { lvl:10, type:'level', label:'Nível 10', state:'done' },
+  { lvl:11, type:'chest', label:'Baú: +50 💎', state:'done' },
+  { lvl:12, type:'level', label:'Nível 12', state:'done' },
+  { lvl:13, type:'badge', label:'🏅 Maratonista', state:'done' },
+  { lvl:14, type:'level', label:'Você está aqui', state:'current' },
+  { lvl:15, type:'chest', label:'Baú surpresa', state:'next' },
+  { lvl:16, type:'level', label:'Nível 16', state:'future' },
+  { lvl:17, type:'tier',  label:'Liga Diamante 💎', state:'future' },
+  { lvl:18, type:'level', label:'Nível 18', state:'future' },
+  { lvl:19, type:'chest', label:'Baú raro', state:'future' },
+  { lvl:20, type:'badge', label:'🏆 500 dominados', state:'future' },
+  { lvl:21, type:'level', label:'Nível 21', state:'future' },
+  { lvl:22, type:'tier',  label:'Rumo a Lenda 👑', state:'future' },
+];
+
+// Missões diárias (gamificação da Home)
+const DAILY_QUESTS = [
+  { ic:'🎯', t:'Estude 50 cards hoje',       cur:30, goal:50, reward:'+20 XP' },
+  { ic:'🔥', t:'Mantenha seu streak',        cur:1,  goal:1,  reward:'+10 XP', done:true },
+  { ic:'🎓', t:'Acerte 10 cards seguidos',   cur:6,  goal:10, reward:'+30 XP · 💎' },
+];

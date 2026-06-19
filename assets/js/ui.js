@@ -18,6 +18,11 @@ const App = {
     exam: 'enem',
     selectedSubjects: ['bio','mat','qui'],
     linkedSchool: null,          // escola vinculada pelo aluno
+    // decks / personalização nova
+    dailyGoalCards: 100,         // meta diária em cards
+    cardsToday: 0,
+    studySource: null,           // { mode:'daily'|'deck'|'exam', label, deckId? }
+    examReviewSel: 'enem',       // prova selecionada na revisão rápida (Perfil)
     // game
     deck: [],
     deckIndex: 0,
@@ -68,7 +73,7 @@ function render(){
   } else if(App.route === 'onboarding'){
     view = DeviceWrap(Onboarding(), { bare:true });
   } else {
-    const tab = ['home','ranking','personalize','profile'].includes(App.route) ? App.route : null;
+    const tab = ['home','decks','jornada','ranking','profile'].includes(App.route) ? App.route : null;
     const inner = ScreenFor(App.route);
     view = DeviceWrap(inner, { tab });
   }
@@ -81,10 +86,11 @@ function render(){
 function ScreenFor(route){
   switch(route){
     case 'home':         return Home();
+    case 'decks':        return Decks();
+    case 'jornada':      return Jornada();
     case 'game':         return Game();
     case 'complete':     return Complete();
     case 'ranking':      return Ranking();
-    case 'personalize':  return Personalize();
     case 'profile':      return Profile();
     case 'linkSchool':   return LinkSchool();
     default:             return Home();
@@ -111,8 +117,9 @@ function DeviceWrap(inner, opts){
 
 const NAV = [
   { id:'home', ic:'🏠', label:'Início' },
+  { id:'decks', ic:'🗂️', label:'Decks' },
+  { id:'jornada', ic:'🗺️', label:'Jornada' },
   { id:'ranking', ic:'🏆', label:'Ranking' },
-  { id:'personalize', ic:'🎯', label:'Personalizar' },
   { id:'profile', ic:'📊', label:'Perfil' },
 ];
 
@@ -146,7 +153,7 @@ function DesktopShell(inner, opts){
     <aside class="webside">
       <div style="padding:6px 10px 14px">${Logo(26)}</div>
       <nav class="webnavlist">${nav}</nav>
-      <button class="btn btn-roxo btn-block mt12" data-act="go" data-route="game" style="margin:0 8px">▶ Estudar</button>
+      <button class="btn btn-roxo btn-block mt12" data-act="start-daily" style="margin:0 8px">▶ Estudar</button>
       <div class="webuser">
         <div class="avatar" style="width:38px;height:38px;font-size:15px;background:var(--roxo-600)">${STUDENT.name[0]}</div>
         <div class="col"><span class="b9 small">${esc(STUDENT.name)}</span><span class="tiny faint">🔥 ${App.s.streak} · ${App.s.xp.toLocaleString('pt-BR')} XP</span></div>
@@ -229,14 +236,15 @@ function handleAct(act, t, e){
     // ranking
     case 'rank-tab':  App.s.rankTab = d.tab; render(); break;
 
-    // personalize
-    case 'set-exam':  { App.s.exam=d.exam; const ex=EXAMS.find(x=>x.id===d.exam); App.s.goal=ex?ex.name:App.s.goal; toast('Foco atualizado: '+(ex?ex.name:''),'success','🎯'); render(); } break;
-    case 'toggle-subj': {
-      const id=d.subj, arr=App.s.selectedSubjects;
-      if(arr.includes(id)){ if(arr.length>1) App.s.selectedSubjects=arr.filter(x=>x!==id); else toast('Escolha ao menos 1 matéria','warn','⚠️'); }
-      else App.s.selectedSubjects=[...arr,id];
-      render(); break;
-    }
+    // decks / personalização
+    case 'unlock-deck': unlockDeck(d.deck); break;
+    case 'study-deck':  startStudy('deck', d.deck); break;
+    case 'start-daily': startStudy('daily'); break;
+    case 'set-goal':    App.s.dailyGoalCards = parseInt(d.goal,10); toast('Meta diária: '+d.goal+' cards','success','🎯'); render(); break;
+
+    // revisão por prova (Perfil)
+    case 'exam-pick':   App.s.examReviewSel = d.exam; render(); break;
+    case 'start-exam':  startStudy('exam', App.s.examReviewSel); break;
 
     // vincular escola
     case 'link-open':  go('linkSchool'); break;
