@@ -240,12 +240,12 @@ function Home(){
         </div>
         <button class="btn btn-amarelo btn-block btn-lg mt12" data-act="start-daily">▶ Estudar agora</button>
       </div>
-      <button class="btn btn-outline btn-block btn-sm mt12" data-act="go" data-route="decks">🗂️ Escolher um deck específico</button>
+      <button class="btn btn-outline btn-block btn-sm mt12" data-act="go" data-route="decks">Escolher um deck específico</button>
     </div>
 
     <!-- Missões diárias -->
     <div class="section">
-      <div class="row between"><div class="b9">🎯 Missões de hoje</div><span class="pill orange small">Renova em 8h</span></div>
+      <div class="row between"><div class="b9">Missões de hoje</div><span class="pill gray small">Renova em 8h</span></div>
       <div class="col gap8 mt8">
         ${DAILY_QUESTS.map(q=>{ const p=Math.min(100,Math.round(q.cur/q.goal*100)); const done=q.done||q.cur>=q.goal;
           return `<div class="card pad" style="padding:12px">
@@ -272,10 +272,11 @@ function Home(){
 
     <!-- Desafio social -->
     <div class="section">
-      <div class="card pad" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA">
-        <div class="row gap12"><div style="font-size:34px">⚔️</div>
-          <div class="grow"><div class="b9">Desafio relâmpago</div><div class="small muted b">Ana te desafiou: 20 cards de Biologia. Faltam <b>4h</b>!</div></div>
-          <button class="btn btn-amarelo btn-sm" data-act="start-daily">Aceitar</button></div>
+      <div class="card pad">
+        <div class="row gap12">
+          <span class="accent-ic" style="background:var(--laranja-100);color:var(--laranja-600)">⚔️</span>
+          <div class="grow"><div class="b9">Desafio de Ana</div><div class="small muted b">20 cards de Biologia · faltam 4h</div></div>
+          <button class="btn btn-outline btn-sm" data-act="start-daily">Aceitar</button></div>
       </div>
     </div>
     <div class="empty-space"></div>
@@ -296,8 +297,8 @@ function Decks(){
 
   return `
   <div>
-    <div class="topbar"><div class="h3">🗂️ Decks</div></div>
-    <p class="hr-pad muted b small" style="margin-top:-4px">Libere os temas conforme estuda. Eles entram na sua revisão diária automaticamente.</p>
+    <div class="topbar"><div class="h3">Decks</div></div>
+    <p class="hr-pad muted b small" style="margin-top:-4px">Libere os temas conforme estuda — eles entram na revisão diária.</p>
 
     <!-- meta diária -->
     <div class="section" style="padding-top:12px">
@@ -335,7 +336,7 @@ function Decks(){
 
     <!-- meus decks -->
     <div class="section">
-      <div class="row between"><div class="b9">📚 Meus decks (${mine.length})</div></div>
+      <div class="row between"><div class="b9">Meus decks (${mine.length})</div></div>
       <div class="col gap8 mt8">
         ${mine.length ? mine.map(d=>{ const sj=SUBJECTS[d.s]; const p=Math.round(d.mastered/d.total*100);
           return `<div class="card pad" style="padding:13px;cursor:pointer" data-act="study-deck" data-deck="${d.id}">
@@ -351,7 +352,7 @@ function Decks(){
 
     <!-- catálogo -->
     <div class="section">
-      <div class="b9">🔎 Catálogo completo</div>
+      <div class="b9">Catálogo completo</div>
       <p class="tiny faint b">Banco com milhares de flashcards de todos os conteúdos.</p>
       ${Object.keys(byMat).map(sid=>{ const sj=SUBJECTS[sid];
         return `<div class="cat-mat mt12">
@@ -401,8 +402,8 @@ function Jornada(){
     <!-- mapa de fases -->
     <div class="section">
       <div class="card pad" style="background:linear-gradient(180deg,#FBFAFE,#F5F3FF);overflow:hidden">
-        <div class="b9 tcenter">🗺️ Sua jornada</div>
-        <p class="tiny faint b tcenter">Cada nível rende XP, baús e conquistas. Conteúdo é livre — aqui é só recompensa.</p>
+        <div class="b9 tcenter">Sua jornada</div>
+        <p class="tiny faint b tcenter">Cada nível rende XP, baús e conquistas.</p>
         <div class="jpath">
           ${JOURNEY.slice().reverse().map((n,i)=>{ const off=[0,40,60,40,0,-40,-60,-40][i%8]||0;
             return `<div class="jnode ${n.type} ${n.state}" style="transform:translateX(${off}px)">
@@ -416,7 +417,7 @@ function Jornada(){
 
     <!-- próximas recompensas -->
     <div class="section">
-      <div class="b9">🎁 Próximas recompensas</div>
+      <div class="b9">Próximas recompensas</div>
       <div class="col gap8 mt8">
         <div class="ach"><div class="medal" style="background:#FACC151a">🎁</div><div class="grow"><div class="b9">Baú surpresa (Nível 15)</div><div class="small muted">Pode vir gems, avatar ou freeze de streak</div></div><span class="pill small">próximo</span></div>
         <div class="ach"><div class="medal" style="background:#06B6D41a">💎</div><div class="grow"><div class="b9">Liga Diamante (Nível 17)</div><div class="small muted">Novo emblema + tema exclusivo</div></div></div>
@@ -459,9 +460,9 @@ function prizeCard(type,it){
 function Premios(){
   const s = App.s, tab = s.shopTab;
   const seg = `<div class="seg">
-    <button class="${tab==='avatar'?'on':''}" data-act="shop-tab" data-tab="avatar">🧑‍🚀 Meu Avatar</button>
-    <button class="${tab==='loja'?'on':''}" data-act="shop-tab" data-tab="loja">🛒 Loja</button>
-    <button class="${tab==='colecao'?'on':''}" data-act="shop-tab" data-tab="colecao">📚 Coleção</button>
+    <button class="${tab==='avatar'?'on':''}" data-act="shop-tab" data-tab="avatar">Meu Avatar</button>
+    <button class="${tab==='loja'?'on':''}" data-act="shop-tab" data-tab="loja">Loja</button>
+    <button class="${tab==='colecao'?'on':''}" data-act="shop-tab" data-tab="colecao">Coleção</button>
   </div>`;
 
   let body='';
@@ -488,12 +489,12 @@ function Premios(){
         <div class="b9" style="color:#fff;font-size:16px">Como ganhar gems?</div>
         <div class="small mt4" style="opacity:.92;color:#fff;font-weight:700">Batendo a meta diária, completando missões, abrindo baús da Jornada e subindo de liga. Tudo de graça — nada de pay-to-win. 💪</div>
       </div>
-      ${sec('🧑‍🚀 Personagens','avatar',AVATARS)}
-      ${sec('🖼️ Molduras','frame',FRAMES)}
-      ${sec('🎨 Cores','color',COLORS)}
-      ${sec('🌈 Temas do app','theme',THEMES)}
-      ${sec('🏷️ Títulos','title',TITLES)}
-      ${sec('🧰 Utilidades','util',UTILITIES)}`;
+      ${sec('Personagens','avatar',AVATARS)}
+      ${sec('Molduras','frame',FRAMES)}
+      ${sec('Cores','color',COLORS)}
+      ${sec('Temas do app','theme',THEMES)}
+      ${sec('Títulos','title',TITLES)}
+      ${sec('Utilidades','util',UTILITIES)}`;
   }
   else { // coleção
     const cats=[['Personagens','avatar',AVATARS],['Molduras','frame',FRAMES],['Cores','color',COLORS],['Temas','theme',THEMES],['Títulos','title',TITLES]];
@@ -509,8 +510,8 @@ function Premios(){
 
   return `
   <div>
-    <div class="topbar"><div class="h3">🎁 Prêmios</div><span class="tag-stat tag-gem">💎 ${s.gems}</span></div>
-    <p class="hr-pad muted b small" style="margin-top:-4px">Desbloqueie personagens, molduras, temas e títulos. Tudo conquistável de graça com gems.</p>
+    <div class="topbar"><div class="h3">Prêmios</div><span class="tag-stat tag-gem">💎 ${s.gems}</span></div>
+    <p class="hr-pad muted b small" style="margin-top:-4px">Desbloqueie itens com gems. Tudo conquistável de graça.</p>
     <div class="section" style="padding-top:12px">${seg}</div>
     <div class="section" style="padding-top:0">${body}</div>
     <div class="empty-space"></div>
@@ -627,9 +628,9 @@ function Ranking(){
     </div>
     <div class="section" style="padding-top:14px">
       <div class="seg">
-        <button class="${tab==='geral'?'on':''}" data-act="rank-tab" data-tab="geral">🌐 Geral</button>
-        <button class="${tab==='prova'?'on':''}" data-act="rank-tab" data-tab="prova">📝 Por prova</button>
-        <button class="${tab==='escola'?'on':''}" data-act="rank-tab" data-tab="escola">🏫 Escola</button>
+        <button class="${tab==='geral'?'on':''}" data-act="rank-tab" data-tab="geral">Geral</button>
+        <button class="${tab==='prova'?'on':''}" data-act="rank-tab" data-tab="prova">Por prova</button>
+        <button class="${tab==='escola'?'on':''}" data-act="rank-tab" data-tab="escola">Escola</button>
       </div>
       <p class="tiny faint mt8 tcenter">${tab==='geral'?'Todos os estudantes da Flipei':tab==='prova'?'Quem está focado no ENEM como você':'Alunos do '+STUDENT.school}</p>
     </div>
@@ -678,7 +679,7 @@ function Profile(){
     <!-- Revisão rápida por prova -->
     <div class="section" style="padding-top:16px">
       <div class="card pad">
-        <div class="b9">⚡ Revisão rápida por prova</div>
+        <div class="b9">Revisão rápida por prova</div>
         <p class="tiny faint b">Puxa do banco inteiro, ponderado pela incidência de cada prova (edital + provas anteriores).</p>
         <div class="row wrap gap8 mt8">
           ${EXAMS.filter(e=>EXAM_WEIGHTS[e.id]).map(e=>`<button class="opt-chip ${sel===e.id?'on':''}" data-act="exam-pick" data-exam="${e.id}">${e.name}</button>`).join('')}
@@ -713,23 +714,23 @@ function Profile(){
     </div>
 
     <div class="section"><div class="card pad">
-      <div class="row between"><div class="b9">📈 Evolução de XP</div><span class="pill green">↑ esta semana</span></div>
+      <div class="row between"><div class="b9">Evolução de XP</div><span class="pill green small">↑ esta semana</span></div>
       ${barChart(weekData,{h:170,values:true})}
     </div></div>
 
     <div class="section"><div class="card pad">
-      <div class="b9">🎯 Acerto por matéria</div><p class="tiny faint b">Onde você brilha e onde precisa de reforço.</p>
+      <div class="b9">Acerto por matéria</div><p class="tiny faint b">Onde você brilha e onde precisa de reforço.</p>
       <div class="mt8">${hBars(subjData,{})}</div>
-      <div class="insight mt8" style="border-color:var(--laranja-500);background:var(--laranja-100)"><span class="small b" style="color:var(--laranja-600)">💡 Física (59%) é seu ponto mais fraco. Que tal liberar o deck "Leis de Newton"?</span></div>
+      <div class="insight mt12" style="border-color:var(--laranja-500);background:var(--laranja-100)"><span class="small b" style="color:var(--laranja-600)">Física (59%) é seu ponto mais fraco. Que tal liberar o deck "Leis de Newton"?</span></div>
     </div></div>
 
     <div class="section"><div class="card pad">
-      <div class="row between"><div class="b9">🗓️ Constância</div><span class="small b muted">${s.streak} dias seguidos 🔥</span></div>
+      <div class="row between"><div class="b9">Constância</div><span class="small b muted">${s.streak} dias seguidos</span></div>
       <div class="cal mt12">${STUDENT.heat.map(l=>`<div class="d l${l}"></div>`).join('')}</div>
     </div></div>
 
     <div class="section">
-      <div class="row between"><div class="b9">🏅 Conquistas</div><span class="link">ver todas</span></div>
+      <div class="row between"><div class="b9">Conquistas</div><span class="link small">ver todas</span></div>
       <div class="col gap8 mt8">
         ${STUDENT.conquistas.map(c=>`<div class="ach ${c.got?'':'locked'}"><div class="medal" style="background:${c.color}1a">${c.ic}</div>
           <div class="grow"><div class="b9">${c.name}</div><div class="small muted">${c.desc}</div></div><div style="font-size:20px">${c.got?'✅':'🔒'}</div></div>`).join('')}
