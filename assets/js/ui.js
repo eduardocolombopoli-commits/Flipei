@@ -45,6 +45,7 @@ const App = {
     // ui
     rankTab: 'geral',
     schoolPage: 'dashboard',
+    schoolPeriod: '30d',
     detailStudent: null,
     // school deck builder
     deckDraft: { title:'', subj:'bio', cards:[] },
@@ -267,6 +268,7 @@ function handleAct(act, t, e){
 
     // school portal
     case 'school-page': App.s.schoolPage=d.page; App.s.detailStudent=null; render(); break;
+    case 'school-period': App.s.schoolPeriod=d.period; render(); break;
     case 'open-student': App.s.detailStudent=d.student; App.s.schoolPage='alunos'; render(); break;
     case 'back-students': App.s.detailStudent=null; render(); break;
     case 'deck-add-card': schoolAddCard(); break;
@@ -360,6 +362,19 @@ function ring(pct, opts){
 function countUp(node, to, dur){
   dur=dur||900; const start=performance.now();
   (function tick(now){ const t=Math.min(1,(now-start)/dur), e=1-Math.pow(1-t,3); node.textContent=Math.round(to*e).toLocaleString('pt-BR'); if(t<1) requestAnimationFrame(tick); })(performance.now());
+}
+
+// sparkline minimalista (para KPIs do portal)
+function sparkline(values, color){
+  const W=130,H=36,max=Math.max.apply(null,values),min=Math.min.apply(null,values),rng=(max-min)||1,sx=W/(values.length-1);
+  const pts=values.map((v,i)=>[i*sx, H-4-((v-min)/rng)*(H-9)]);
+  const d=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=d+` L ${W} ${H} L 0 ${H} Z`;
+  color=color||'#7C3AED';
+  return `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <defs><linearGradient id="sp${Math.random().toString(36).slice(2,7)}" x1="0" y1="0" x2="0" y2="1"></linearGradient></defs>
+    <path d="${area}" fill="${color}" opacity="0.08"/>
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
 // aplica o tema cosmético equipado (muda o acento da interface)

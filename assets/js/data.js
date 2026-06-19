@@ -349,3 +349,56 @@ const UTILITIES = [
   { id:'turbo',  emoji:'⚡', name:'Turbo de XP',        cost:150, desc:'2× XP por 30 minutos' },
   { id:'dica',   emoji:'💡', name:'Pacote de dicas (5)', cost:120, desc:'Revela uma pista no card difícil' },
 ];
+
+/* =========================================================================
+   ESCOLA — analytics profissional (indicadores reais + insights)
+   ========================================================================= */
+const SCH_OVERVIEW = {
+  dau:142, wau:198, mau:224, totalAlunos:240,
+  ativacao:86,            // % cadastrados que ativaram
+  streakMedio:9,          // dias
+  tempoMedioDia:18,       // min/aluno/dia
+  retencao30:64,          // % retidos em 30 dias
+  editalCobertura:47,     // % do edital coberto pela base
+  // a métrica que mais vende: evolução de nota em simulado
+  simulado:{ atual:612, anterior:570, delta:'+42 pts', deltaPct:'+7,4%', up:true,
+    serie:[520,548,565,583,602,612], labels:['Jan','Fev','Mar','Abr','Mai','Jun'] },
+};
+
+// retenção por coorte (% ativos ao longo das semanas)
+const RETENTION_COHORT = { labels:['D0','Sem 1','Sem 2','Sem 3','Sem 4','Sem 6'], values:[100,82,71,66,61,58] };
+
+// IMPACTO: alunos ativos vs. pouco ativos (prova de eficácia)
+const ACTIVE_VS_INACTIVE = {
+  acc:{ ativos:81, inativos:58 },
+  simulado:{ ativos:632, inativos:548 },
+  tempo:{ ativos:24, inativos:6 },
+};
+
+// funil de adoção
+const ADOPTION_FUNNEL = [
+  { l:'Cadastrados', v:240 },
+  { l:'Ativaram a conta', v:206 },
+  { l:'Ativos na semana', v:198 },
+  { l:'Com hábito (streak 7+)', v:91 },
+];
+
+// cobertura do edital por matéria (meta vs. coberto, em % do edital)
+const EDITAL_COVERAGE = [
+  { s:'por', target:14, done:11 },
+  { s:'mat', target:12, done:7 },
+  { s:'bio', target:10, done:8 },
+  { s:'his', target:9,  done:7 },
+  { s:'qui', target:8,  done:4 },
+  { s:'fis', target:8,  done:3 },
+  { s:'geo', target:7,  done:5 },
+];
+
+// insights acionáveis (gerados pela IA da plataforma)
+const SCHOOL_INSIGHTS = [
+  { type:'positive', t:'Quem usa, vai melhor', d:'Alunos ativos têm acurácia 23 p.p. maior e nota de simulado 84 pontos acima dos pouco ativos. O uso está correlacionado a desempenho.', acao:'Incentivar adesão nas turmas com baixa atividade' },
+  { type:'critical', t:'Queda de engajamento no 3º Ano C', d:'O 3ºC caiu 14% de atividade em 2 semanas; 9 alunos estão inativos há 3+ dias. Risco de evasão do hábito.', acao:'Propor atividade em sala + falar com os 9 alunos' },
+  { type:'warning', t:'Física é o gargalo crítico', d:'Física tem a pior acurácia da escola (55%) e só 3% de 8% do edital coberto. Tema de alta incidência e baixo domínio.', acao:'Criar atividade focada em Mecânica' },
+  { type:'warning', t:'Matemática: incidência alta, domínio baixo', d:'Matemática pesa ~10% no ENEM, mas a turma cobriu só 7% do edital e tem 61% de acurácia.', acao:'Priorizar funções e geometria' },
+  { type:'positive', t:'Constância em alta', d:'72% dos alunos mantêm streak ativo; streak médio subiu de 6 para 9 dias no mês.', acao:'Manter o ritmo; reconhecer os destaques' },
+];
