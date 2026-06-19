@@ -23,6 +23,11 @@ const App = {
     cardsToday: 0,
     studySource: null,           // { mode:'daily'|'deck'|'exam', label, deckId? }
     examReviewSel: 'enem',       // prova selecionada na revisão rápida (Perfil)
+    // recompensas / prêmios
+    owned: { avatar:['coruja'], frame:['none'], color:['#7C3AED'], theme:['default'], title:['none','maratona'] },
+    equipped: { avatar:'coruja', frame:'none', color:'#7C3AED', theme:'default', title:'maratona' },
+    inventory: { freeze:1, turbo:0, dica:2 },
+    shopTab: 'avatar',           // 'avatar' | 'loja' | 'colecao'
     // game
     deck: [],
     deckIndex: 0,
@@ -73,11 +78,12 @@ function render(){
   } else if(App.route === 'onboarding'){
     view = DeviceWrap(Onboarding(), { bare:true });
   } else {
-    const tab = ['home','decks','jornada','ranking','profile'].includes(App.route) ? App.route : null;
+    const tab = ['home','decks','jornada','ranking','premios','profile'].includes(App.route) ? App.route : null;
     const inner = ScreenFor(App.route);
     view = DeviceWrap(inner, { tab });
   }
   App.root.innerHTML = view;
+  applyTheme();
   renderControls();
   wireOnce();
   runPostRender();
@@ -91,6 +97,7 @@ function ScreenFor(route){
     case 'game':         return Game();
     case 'complete':     return Complete();
     case 'ranking':      return Ranking();
+    case 'premios':      return Premios();
     case 'profile':      return Profile();
     case 'linkSchool':   return LinkSchool();
     default:             return Home();
@@ -120,6 +127,7 @@ const NAV = [
   { id:'decks', ic:'🗂️', label:'Decks' },
   { id:'jornada', ic:'🗺️', label:'Jornada' },
   { id:'ranking', ic:'🏆', label:'Ranking' },
+  { id:'premios', ic:'🎁', label:'Prêmios' },
   { id:'profile', ic:'📊', label:'Perfil' },
 ];
 
@@ -246,6 +254,11 @@ function handleAct(act, t, e){
     case 'exam-pick':   App.s.examReviewSel = d.exam; render(); break;
     case 'start-exam':  startStudy('exam', App.s.examReviewSel); break;
 
+    // prêmios / recompensas
+    case 'shop-tab':    App.s.shopTab = d.tab; render(); break;
+    case 'buy-item':    buyItem(d.type, d.id); break;
+    case 'equip-item':  equipItem(d.type, d.id); break;
+
     // vincular escola
     case 'link-open':  go('linkSchool'); break;
     case 'link-submit': submitLink(); break;
@@ -347,4 +360,11 @@ function ring(pct, opts){
 function countUp(node, to, dur){
   dur=dur||900; const start=performance.now();
   (function tick(now){ const t=Math.min(1,(now-start)/dur), e=1-Math.pow(1-t,3); node.textContent=Math.round(to*e).toLocaleString('pt-BR'); if(t<1) requestAnimationFrame(tick); })(performance.now());
+}
+
+// aplica o tema cosmético equipado (muda o acento da interface)
+function applyTheme(){
+  if(!document.body) return;
+  const t = (App.role==='aluno' && App.s.equipped) ? App.s.equipped.theme : 'default';
+  document.body.setAttribute('data-theme', t || 'default');
 }

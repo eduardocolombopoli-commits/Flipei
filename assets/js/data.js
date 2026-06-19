@@ -282,3 +282,70 @@ const DAILY_QUESTS = [
   { ic:'🔥', t:'Mantenha seu streak',        cur:1,  goal:1,  reward:'+10 XP', done:true },
   { ic:'🎓', t:'Acerte 10 cards seguidos',   cur:6,  goal:10, reward:'+30 XP · 💎' },
 ];
+
+/* =========================================================================
+   RECOMPENSAS — avatares (personagens), molduras, cores, temas, títulos, utilidades
+   cost = preço em gems | cost:null = só por conquista (lendário, não compra)
+   ========================================================================= */
+const RARITY = {
+  comum:    { name:'Comum',    color:'#94A3B8' },
+  raro:     { name:'Raro',     color:'#3B82F6' },
+  epico:    { name:'Épico',    color:'#A855F7' },
+  lendario: { name:'Lendário', color:'#F59E0B' },
+};
+
+// Personagens (avatar). emoji como arte do protótipo.
+const AVATARS = [
+  { id:'coruja',    emoji:'🦉', name:'Coruja Sábia',     rarity:'comum',    cost:0 },
+  { id:'cerebro',   emoji:'🧠', name:'Cérebro Turbo',    rarity:'comum',    cost:150 },
+  { id:'foguete',   emoji:'🚀', name:'Foguete',          rarity:'raro',     cost:300 },
+  { id:'capivara',  emoji:'🦫', name:'Capivara Zen',     rarity:'raro',     cost:400 },
+  { id:'raposa',    emoji:'🦊', name:'Raposa Esperta',   rarity:'epico',    cost:700 },
+  { id:'dragao',    emoji:'🐲', name:'Dragão do Saber',  rarity:'epico',    cost:900 },
+  { id:'unicornio', emoji:'🦄', name:'Unicórnio',        rarity:'lendario', cost:null, unlock:'Streak de 100 dias' },
+  { id:'leao',      emoji:'🦁', name:'Leão Lenda',       rarity:'lendario', cost:null, unlock:'Chegue à Liga Lenda' },
+];
+
+// Molduras do avatar
+const FRAMES = [
+  { id:'none',     name:'Sem moldura', rarity:'comum',    cost:0,    color:null },
+  { id:'bronze',   name:'Bronze',      rarity:'comum',    cost:100,  color:'#B45309' },
+  { id:'prata',    name:'Prata',       rarity:'comum',    cost:200,  color:'#94A3B8' },
+  { id:'ouro',     name:'Ouro',        rarity:'raro',     cost:400,  color:'#EAB308' },
+  { id:'neon',     name:'Neon',        rarity:'epico',    cost:600,  color:'#22D3EE', glow:true },
+  { id:'diamante', name:'Diamante',    rarity:'lendario', cost:null, color:'#06B6D4', glow:true, unlock:'Liga Diamante' },
+];
+
+// Cores de fundo do avatar
+const COLORS = [
+  { id:'#7C3AED', name:'Roxo',    cost:0 },
+  { id:'#EC4899', name:'Rosa',    cost:80 },
+  { id:'#22C55E', name:'Verde',   cost:80 },
+  { id:'#3B82F6', name:'Azul',    cost:80 },
+  { id:'#F59E0B', name:'Laranja', cost:120 },
+  { id:'#14B8A6', name:'Teal',    cost:120 },
+];
+
+// Temas do app (mudam o acento da interface)
+const THEMES = [
+  { id:'default', name:'Roxo (padrão)', rarity:'comum',  cost:0 },
+  { id:'ocean',   name:'Oceano',        rarity:'raro',   cost:300 },
+  { id:'sunset',  name:'Pôr do sol',    rarity:'raro',   cost:300 },
+  { id:'neon',    name:'Neon',          rarity:'epico',  cost:500 },
+];
+
+// Títulos exibidos no perfil/ranking
+const TITLES = [
+  { id:'none',    name:'(sem título)',        rarity:'comum',    cost:0 },
+  { id:'maratona',name:'Maratonista',         rarity:'comum',    cost:null, unlock:'Conquista: streak 7 dias' },
+  { id:'biologo', name:'Mestre da Biologia',  rarity:'raro',     cost:200 },
+  { id:'focado',  name:'Foco Total',          rarity:'raro',     cost:200 },
+  { id:'imparavel',name:'Imparável',          rarity:'lendario', cost:null, unlock:'Streak de 30 dias' },
+];
+
+// Utilidades (consumíveis — não dão vantagem de aprendizado)
+const UTILITIES = [
+  { id:'freeze', emoji:'🛡️', name:'Protetor de streak', cost:200, desc:'Salva sua ofensiva se faltar 1 dia' },
+  { id:'turbo',  emoji:'⚡', name:'Turbo de XP',        cost:150, desc:'2× XP por 30 minutos' },
+  { id:'dica',   emoji:'💡', name:'Pacote de dicas (5)', cost:120, desc:'Revela uma pista no card difícil' },
+];

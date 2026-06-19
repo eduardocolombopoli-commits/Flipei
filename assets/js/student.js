@@ -27,6 +27,46 @@ function startStudy(mode, payload){
   go('game');
 }
 
+// ---------- recompensas: helpers ----------
+function listFor(type){ return type==='avatar'?AVATARS : type==='frame'?FRAMES : type==='color'?COLORS : type==='theme'?THEMES : type==='title'?TITLES : UTILITIES; }
+function itemFor(type,id){ return listFor(type).find(x=>x.id===id); }
+function isOwned(type,id){ return (App.s.owned[type]||[]).includes(id); }
+
+// avatar do usuário (personagem + cor + moldura equipados)
+function avatarHTML(size){
+  const e = App.s.equipped;
+  const av = AVATARS.find(a=>a.id===e.avatar) || AVATARS[0];
+  const fr = FRAMES.find(f=>f.id===e.frame) || FRAMES[0];
+  const ring = fr.color ? `box-shadow:0 0 0 3px #fff, 0 0 0 6px ${fr.color}${fr.glow?`, 0 0 14px ${fr.color}`:''};` : '';
+  return `<span class="av" style="width:${size}px;height:${size}px;background:${e.color};font-size:${Math.round(size*0.55)}px;${ring}">${av.emoji}</span>`;
+}
+function equippedTitle(){ const t=TITLES.find(x=>x.id===App.s.equipped.title); return t&&t.id!=='none'?t.name:''; }
+
+function buyItem(type,id){
+  const it = itemFor(type,id); if(!it) return;
+  if(it.cost===null||it.cost===undefined){ toast('Esse item é só por conquista 🏆','brand','🔒'); return; }
+  if(type!=='util' && isOwned(type,id)){ equipItem(type,id); return; }
+  if(App.s.gems < it.cost){ toast('Gems insuficientes — estude pra ganhar mais 💎','warn','💎'); return; }
+  App.s.gems -= it.cost;
+  if(type==='util'){ App.s.inventory[id] = (App.s.inventory[id]||0)+ (id==='dica'?5:1); toast('Comprado: '+it.name,'success','✅'); }
+  else {
+    (App.s.owned[type]=App.s.owned[type]||[]).push(id);
+    App.s.equipped[type] = id;            // equipa automaticamente
+    if(type==='theme') applyTheme();
+    const rare = it.rarity==='epico'||it.rarity==='lendario';
+    toast('Desbloqueado: '+(it.name||id)+(rare?' 🎉':''),'success','🎁');
+    if(rare) confetti({count:120,y:innerHeight*0.4});
+  }
+  render();
+}
+function equipItem(type,id){
+  if(!isOwned(type,id)){ toast('Você ainda não tem esse item','warn','🔒'); return; }
+  App.s.equipped[type] = id;
+  if(type==='theme') applyTheme();
+  toast('Equipado!','success','✨');
+  render();
+}
+
 // =========================================================================
 // SPLASH
 // =========================================================================
@@ -366,7 +406,7 @@ function Jornada(){
         <div class="jpath">
           ${JOURNEY.slice().reverse().map((n,i)=>{ const off=[0,40,60,40,0,-40,-60,-40][i%8]||0;
             return `<div class="jnode ${n.type} ${n.state}" style="transform:translateX(${off}px)">
-              ${n.state==='current'?`<div class="jflag">VOCÊ 🧍</div>`:''}
+              ${n.state==='current'?`<div class="jflag">${avatarHTML(26)} VOCÊ</div>`:''}
               <div class="jbubble">${nodeIcon(n)}</div>
               <div class="jlabel">${n.label}</div>
             </div>`; }).join('')}
@@ -383,6 +423,96 @@ function Jornada(){
         <div class="ach"><div class="medal" style="background:#A855F71a">🏆</div><div class="grow"><div class="b9">500 cards dominados</div><div class="small muted">Conquista "Cérebro de Aço"</div></div></div>
       </div>
     </div>
+    <div class="empty-space"></div>
+  </div>`;
+}
+
+// =========================================================================
+// PRÊMIOS — Meu Avatar / Loja / Coleção
+// =========================================================================
+function prizeVisual(type,it){
+  if(type==='avatar') return `<span class="av" style="width:46px;height:46px;background:#F1EFF6;font-size:26px">${it.emoji}</span>`;
+  if(type==='util')   return `<span class="av" style="width:46px;height:46px;background:#F1EFF6;font-size:24px">${it.emoji}</span>`;
+  if(type==='title')  return `<span class="av" style="width:46px;height:46px;background:#F1EFF6;font-size:22px">🏷️</span>`;
+  if(type==='frame')  return `<span class="prize-ring" style="${it.color?`box-shadow:0 0 0 3px #fff,0 0 0 6px ${it.color}${it.glow?`,0 0 12px ${it.color}`:''}`:'border:2px dashed #CBD5E1'}"></span>`;
+  if(type==='color')  return `<span class="prize-dot" style="background:${it.id}"></span>`;
+  if(type==='theme'){ const g={default:'linear-gradient(135deg,#7C3AED,#DB2777)',ocean:'linear-gradient(135deg,#0EA5E9,#14B8A6)',sunset:'linear-gradient(135deg,#FB923C,#EC4899)',neon:'linear-gradient(135deg,#22D3EE,#A855F7)'}[it.id]||'#7C3AED'; return `<span class="prize-theme" style="background:${g}"></span>`; }
+  return '';
+}
+function prizeCard(type,it){
+  const owned = type!=='util' && isOwned(type,it.id);
+  const eq = type!=='util' && App.s.equipped[type]===it.id;
+  const rar = RARITY[it.rarity]||RARITY.comum;
+  let btn;
+  if(type==='util') btn=`<button class="btn btn-amarelo btn-sm" data-act="buy-item" data-type="util" data-id="${it.id}">${it.cost} 💎</button>`;
+  else if(eq) btn=`<span class="pill green small">Equipado ✓</span>`;
+  else if(owned) btn=`<button class="btn btn-outline btn-sm" data-act="equip-item" data-type="${type}" data-id="${it.id}">Equipar</button>`;
+  else if(it.cost===null) btn=`<span class="pill outline small">🔒</span>`;
+  else btn=`<button class="btn btn-amarelo btn-sm" data-act="buy-item" data-type="${type}" data-id="${it.id}">${it.cost} 💎</button>`;
+  const sub = type==='util' ? it.desc : (rar.name + (!owned&&it.cost===null&&it.unlock ? ' · '+it.unlock : ''));
+  return `<div class="prize">
+    <div class="prize-vis">${prizeVisual(type,it)}</div>
+    <div class="grow"><div class="b small">${it.name}</div><div class="tiny b" style="color:${type==='util'?'var(--ink-faint)':rar.color}">${sub}</div></div>
+    ${btn}</div>`;
+}
+
+function Premios(){
+  const s = App.s, tab = s.shopTab;
+  const seg = `<div class="seg">
+    <button class="${tab==='avatar'?'on':''}" data-act="shop-tab" data-tab="avatar">🧑‍🚀 Meu Avatar</button>
+    <button class="${tab==='loja'?'on':''}" data-act="shop-tab" data-tab="loja">🛒 Loja</button>
+    <button class="${tab==='colecao'?'on':''}" data-act="shop-tab" data-tab="colecao">📚 Coleção</button>
+  </div>`;
+
+  let body='';
+  if(tab==='avatar'){
+    const cat=(label,type,list)=>`<div class="mt16"><div class="eyebrow">${label}</div>
+      <div class="col gap8 mt8">${list.filter(it=>isOwned(type,it.id)).map(it=>prizeCard(type,it)).join('')}
+        <button class="btn btn-ghost btn-block btn-sm" data-act="shop-tab" data-tab="loja">＋ Desbloquear mais na Loja</button></div></div>`;
+    body = `
+      <div class="tcenter" style="padding:8px 0 4px">
+        ${avatarHTML(104)}
+        <div class="h3 mt8">${esc(STUDENT.name)}</div>
+        ${equippedTitle()?`<div class="pill mt4" style="display:inline-flex">🏷️ ${equippedTitle()}</div>`:`<div class="tiny faint b mt4">sem título equipado</div>`}
+      </div>
+      ${cat('Personagem','avatar',AVATARS)}
+      ${cat('Moldura','frame',FRAMES)}
+      ${cat('Cor de fundo','color',COLORS)}
+      ${cat('Título','title',TITLES)}
+      ${cat('Tema do app','theme',THEMES)}`;
+  }
+  else if(tab==='loja'){
+    const sec=(label,type,list)=>`<div class="mt16"><div class="eyebrow">${label}</div><div class="col gap8 mt8">${list.filter(it=>!(type!=='util'&&it.cost===0)).map(it=>prizeCard(type,it)).join('')}</div></div>`;
+    body = `
+      <div class="ai-card" style="background:linear-gradient(135deg,#312E81,#6D28D9)"><div class="spark">💎</div>
+        <div class="b9" style="color:#fff;font-size:16px">Como ganhar gems?</div>
+        <div class="small mt4" style="opacity:.92;color:#fff;font-weight:700">Batendo a meta diária, completando missões, abrindo baús da Jornada e subindo de liga. Tudo de graça — nada de pay-to-win. 💪</div>
+      </div>
+      ${sec('🧑‍🚀 Personagens','avatar',AVATARS)}
+      ${sec('🖼️ Molduras','frame',FRAMES)}
+      ${sec('🎨 Cores','color',COLORS)}
+      ${sec('🌈 Temas do app','theme',THEMES)}
+      ${sec('🏷️ Títulos','title',TITLES)}
+      ${sec('🧰 Utilidades','util',UTILITIES)}`;
+  }
+  else { // coleção
+    const cats=[['Personagens','avatar',AVATARS],['Molduras','frame',FRAMES],['Cores','color',COLORS],['Temas','theme',THEMES],['Títulos','title',TITLES]];
+    body = cats.map(([label,type,list])=>{
+      const own=list.filter(it=>isOwned(type,it.id)).length;
+      const grid=list.map(it=>{ const owned=isOwned(type,it.id); const rar=RARITY[it.rarity]||RARITY.comum;
+        return `<div class="coll-item ${owned?'':'locked'}" title="${esc(it.name)}" style="border-color:${owned?rar.color:'var(--line)'}">
+          ${prizeVisual(type,it)}<div class="tiny b" style="color:${owned?rar.color:'var(--ink-faint)'}">${owned?it.name.split(' ')[0]:'🔒'}</div></div>`; }).join('');
+      return `<div class="mt16"><div class="row between"><div class="eyebrow">${label}</div><span class="pill gray small">${own}/${list.length}</span></div>
+        <div class="coll-grid mt8">${grid}</div></div>`;
+    }).join('');
+  }
+
+  return `
+  <div>
+    <div class="topbar"><div class="h3">🎁 Prêmios</div><span class="tag-stat tag-gem">💎 ${s.gems}</span></div>
+    <p class="hr-pad muted b small" style="margin-top:-4px">Desbloqueie personagens, molduras, temas e títulos. Tudo conquistável de graça com gems.</p>
+    <div class="section" style="padding-top:12px">${seg}</div>
+    <div class="section" style="padding-top:0">${body}</div>
     <div class="empty-space"></div>
   </div>`;
 }
@@ -507,9 +637,9 @@ function Ranking(){
       ${list.map((u,i)=>{ const pos=i+1, top=pos<=3?'top'+pos:'', medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos;
         const html=`<div class="rank-row ${u.me?'me':''} ${top}">
           <div class="rank-pos">${medal}</div>
-          <div class="avatar" style="background:${u.av};width:40px;height:40px;font-size:15px">${u.name[0]}</div>
+          ${u.me ? avatarHTML(40) : `<div class="avatar" style="background:${u.av};width:40px;height:40px;font-size:15px">${u.name[0]}</div>`}
           <div class="grow"><div class="b9">${u.name}${u.me?' <span class="pill" style="padding:2px 8px;font-size:11px">você</span>':''}</div>
-            <div class="tiny faint b">Nível ${14-i>0?14-i:1}</div></div>
+            <div class="tiny faint b">${u.me&&equippedTitle()?equippedTitle():'Nível '+(14-i>0?14-i:1)}</div></div>
           <div class="tag-stat tag-xp" style="font-size:14px">${u.xp.toLocaleString('pt-BR')}</div></div>`;
         return pos===promoteAt ? `${html}<div class="promo-line">Zona de promoção ⬆️</div>` : html;
       }).join('')}
@@ -532,9 +662,11 @@ function Profile(){
   <div>
     <div style="background:var(--grad-brand);padding:22px 18px 26px;color:#fff;border-radius:0 0 26px 26px;">
       <div class="row between">
-        <div class="row gap12"><div class="avatar" style="background:#fff;color:var(--roxo-700);width:56px;height:56px;font-size:24px">${STUDENT.name[0]}</div>
-          <div><div class="h3" style="color:#fff">${STUDENT.name}</div><div class="small" style="opacity:.9;font-weight:800">${STUDENT.handle}${linked?' · '+esc(linked):''}</div></div></div>
-        <button class="icon-btn" style="background:rgba(255,255,255,.18);color:#fff">⚙️</button>
+        <div class="row gap12">${avatarHTML(56)}
+          <div><div class="h3" style="color:#fff">${STUDENT.name}</div>
+            ${equippedTitle()?`<div class="small" style="opacity:.95;font-weight:800">🏷️ ${equippedTitle()}</div>`:''}
+            <div class="tiny" style="opacity:.85;font-weight:800">${STUDENT.handle}${linked?' · '+esc(linked):''}</div></div></div>
+        <button class="icon-btn" style="background:rgba(255,255,255,.18);color:#fff" data-act="go" data-route="premios">🎁</button>
       </div>
       <div class="row gap8 mt16">
         <div class="grow tcenter" style="background:rgba(255,255,255,.14);border-radius:14px;padding:10px"><div class="h3" style="color:#fff">🔥 ${s.streak}</div><div class="tiny b" style="opacity:.9">dias</div></div>
